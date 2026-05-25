@@ -197,9 +197,17 @@ const API_KEY_STORAGE_KEY="csc_ready_openai_key_v1";
 function loadProgress(){
   try{
     const d=localStorage.getItem(STORAGE_KEY);
-    if(d)return JSON.parse(d);
+    if(d)return normalizeProgress(JSON.parse(d));
   }catch(e){}
-  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{}};
+  return getDefaultProgress();
+}
+
+function getDefaultProgress(){
+  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{},activeQuizzes:{}};
+}
+
+function normalizeProgress(progress){
+  return{...getDefaultProgress(),...progress,activeQuizzes:progress?.activeQuizzes||{}};
 }
 
 function saveProgress(p){
@@ -262,6 +270,41 @@ function getScoreBadgeClass(pct){
   return"badge-red";
 }
 
+function getQuizKey(mode,category=null){
+  return mode==="category"&&category?`category:${category}`:mode;
+}
+
+function getQuestionById(id){
+  return QUESTIONS.find(q=>q.id===id);
+}
+
+function restoreQuiz(saved){
+  if(!saved?.questionIds?.length)return null;
+  const questions=saved.questionIds.map(getQuestionById).filter(Boolean);
+  if(!questions.length)return null;
+  return{
+    questions,
+    current:Math.min(saved.current||0,questions.length-1),
+    answers:saved.answers||[],
+    mode:saved.mode,
+    category:saved.category||null,
+    quizKey:saved.quizKey||getQuizKey(saved.mode,saved.category),
+    sessionStart:saved.sessionStart||Date.now()
+  };
+}
+
+function serializeQuiz(state){
+  return{
+    questionIds:state.questions.map(q=>q.id),
+    current:state.current||0,
+    answers:state.answers||[],
+    mode:state.mode,
+    category:state.category||null,
+    quizKey:state.quizKey||getQuizKey(state.mode,state.category),
+    sessionStart:state.sessionStart||Date.now()
+  };
+}
+
 function App(){
   const [screen,setScreen]=useState("home");
   const [progress,setProgress]=useState(loadProgress);
@@ -313,7 +356,46 @@ function App(){
     });
   };
 
-  const startQuiz=(mode,category=null)=>{
+  const saveActiveQuiz=(state)=>{
+    const quizKey=state.quizKey||getQuizKey(state.mode,state.category);
+    const saved=serializeQuiz({...state,quizKey});
+    setProgress(prev=>({...prev,activeQuizzes:{...(prev.activeQuizzes||{}),[quizKey]:saved}}));
+  };
+
+  const resetActiveQuiz=(quizKey,answersToRemove=[])=>{
+    setProgress(prev=>{
+      const nextActive={...(prev.activeQuizzes||{})};
+      delete nextActive[quizKey];
+      const next={...prev,activeQuizzes:nextActive};
+      answersToRemove.forEach(answer=>{
+        const question=getQuestionById(answer.qId);
+        const category=answer.category||question?.category;
+        next.totalAnswered=Math.max(0,(next.totalAnswered||0)-1);
+        if(answer.correct)next.totalCorrect=Math.max(0,(next.totalCorrect||0)-1);
+        if(category&&next.categoryScores?.[category]){
+          next.categoryScores={...next.categoryScores};
+          next.categoryScores[category]={
+            correct:Math.max(0,(next.categoryScores[category].correct||0)-(answer.correct?1:0)),
+            total:Math.max(0,(next.categoryScores[category].total||0)-1)
+          };
+        }
+        if(!answer.correct){
+          next.wrongQuestions=(next.wrongQuestions||[]).filter(id=>id!==answer.qId);
+        }
+      });
+      return next;
+    });
+  };
+
+  const startQuiz=(mode,category=null,forceNew=false)=>{
+    const quizKey=getQuizKey(mode,category);
+    const restored=!forceNew?restoreQuiz(progress.activeQuizzes?.[quizKey]):null;
+    if(restored){
+      setQuizState(restored);
+      setScreen("quiz");
+      return;
+    }
+
     let qs;
     if(mode==="drill"){
       qs=QUESTIONS.filter(q=>progress.wrongQuestions.includes(q.id));
@@ -324,12 +406,14 @@ function App(){
     }else{
       qs=[...QUESTIONS].sort(()=>Math.random()-0.5);
     }
-    setQuizState({questions:qs,current:0,answers:[],mode,sessionStart:Date.now()});
+    const nextQuiz={questions:qs,current:0,answers:[],mode,category,quizKey,sessionStart:Date.now()};
+    setQuizState(nextQuiz);
+    saveActiveQuiz(nextQuiz);
     setScreen("quiz");
   };
 
   if(showSettings)return<Settings apiKey={apiKey} setApiKey={setApiKey} progress={progress} setProgress={setProgress} onBack={()=>setShowSettings(false)}/>;
-  if(screen==="quiz"&&quizState)return<QuizScreen quizState={quizState} setQuizState={setQuizState} apiKey={apiKey} updateProgress={updateProgress} progress={progress} onEnd={(results)=>{setScreen("results");setQuizState(prev=>({...prev,results}));}} onHome={()=>setScreen("home")}/>;
+  if(screen==="quiz"&&quizState)return<QuizScreen quizState={quizState} setQuizState={setQuizState} apiKey={apiKey} updateProgress={updateProgress} progress={progress} saveActiveQuiz={saveActiveQuiz} resetActiveQuiz={resetActiveQuiz} onEnd={(results)=>{setScreen("results");setQuizState(prev=>({...prev,results}));}} onHome={()=>setScreen("home")}/>;
   if(screen==="results"&&quizState?.results)return<ResultsScreen results={quizState.results} mode={quizState.mode} apiKey={apiKey} onDrill={()=>startQuiz("drill")} onHome={()=>setScreen("home")}/>;
   if(screen==="dilemmas")return<DilemmasScreen apiKey={apiKey} onHome={()=>setScreen("home")}/>;
   if(screen==="category")return<CategorySelect onSelect={(cat)=>startQuiz("category",cat)} onHome={()=>setScreen("home")} progress={progress}/>;
@@ -376,9 +460,9 @@ function App(){
       <div style={{marginBottom:14,fontSize:13,color:"#667085",fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}>Study Modes</div>
       <div className="grid-2" style={{marginBottom:32}}>
         <button className="btn btn-primary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("category")}>Quiz by Category</button>
-        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>startQuiz("all")}>All Questions</button>
+        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>startQuiz("all")}>{progress.activeQuizzes?.all?"Continue All Questions":"All Questions"}</button>
         <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px",opacity:progress.wrongQuestions.length===0?0.4:1}} onClick={()=>startQuiz("drill")} disabled={progress.wrongQuestions.length===0}>
-          Drill Weak Areas {progress.wrongQuestions.length>0&&<span className="badge badge-red">{progress.wrongQuestions.length}</span>}
+          {progress.activeQuizzes?.drill?"Continue Weak Areas":"Drill Weak Areas"} {progress.wrongQuestions.length>0&&<span className="badge badge-red">{progress.wrongQuestions.length}</span>}
         </button>
         <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("dilemmas")}>Dilemma Scenarios</button>
       </div>
@@ -397,10 +481,11 @@ function CategorySelect({onSelect,onHome,progress}){
         {Object.entries(CATEGORIES).map(([k,v])=>{
           const pct=getCatScore(progress,k);
           const count=QUESTIONS.filter(q=>q.category===k).length;
+          const saved=progress.activeQuizzes?.[getQuizKey("category",k)];
           return<div key={k} className="category-card" onClick={()=>onSelect(k)}>
             <div className="category-icon">{k}</div>
             <div style={{fontSize:17,fontWeight:700,marginBottom:8,color:"#17202c"}}>{v}</div>
-            <div style={{fontSize:14,color:"#667085",marginBottom:12}}>{count} questions</div>
+            <div style={{fontSize:14,color:"#667085",marginBottom:12}}>{saved?`${saved.answers?.length||0} answered · continue`:`${count} questions`}</div>
             {pct!==null&&<span className={`badge ${getScoreBadgeClass(pct)}`}>{pct}%</span>}
             {pct===null&&<span className="badge badge-blue">Not started</span>}
           </div>;
@@ -410,30 +495,33 @@ function CategorySelect({onSelect,onHome,progress}){
   );
 }
 
-function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd,onHome}){
+function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,saveActiveQuiz,resetActiveQuiz,onEnd,onHome}){
   const {questions,current,mode}=quizState;
   const q=questions[current];
-  const [selected,setSelected]=useState(null);
-  const [submitted,setSubmitted]=useState(false);
+  const [answers,setAnswers]=useState(quizState.answers||[]);
+  const savedAnswer=(quizState.answers||[]).find(a=>a.qId===q.id);
+  const [selected,setSelected]=useState(savedAnswer?.selected??null);
+  const [submitted,setSubmitted]=useState(Boolean(savedAnswer));
   const [arabicOn,setArabicOn]=useState(false);
   const [arabic,setArabic]=useState({question:null,options:[],explanation:null});
   const [loadingArabic,setLoadingArabic]=useState(false);
   const [explanation,setExplanation]=useState(q.explanation);
-  const [simplifiedExplanation,setSimplifiedExplanation]=useState(null);
+  const [simplifiedExplanation,setSimplifiedExplanation]=useState(savedAnswer?.simplifiedExplanation||null);
   const [loadingSimplify,setLoadingSimplify]=useState(false);
-  const [whyWrong,setWhyWrong]=useState(null);
+  const [whyWrong,setWhyWrong]=useState(savedAnswer?.whyWrong||null);
   const [loadingWhyWrong,setLoadingWhyWrong]=useState(false);
-  const [answers,setAnswers]=useState(quizState.answers||[]);
   const cacheRef=useRef(progress.arabicCache||{});
 
   const pct=Math.round(((current)/questions.length)*100);
 
   useEffect(()=>{
-    setSelected(null);setSubmitted(false);setArabicOn(false);
+    const saved=(quizState.answers||[]).find(a=>a.qId===q.id);
+    setAnswers(quizState.answers||[]);
+    setSelected(saved?.selected??null);setSubmitted(Boolean(saved));setArabicOn(false);
     setArabic({question:null,options:[],explanation:null});
-    setExplanation(q.explanation);setSimplifiedExplanation(null);
-    setWhyWrong(null);
-  },[current,q.id]);
+    setExplanation(q.explanation);setSimplifiedExplanation(saved?.simplifiedExplanation||null);
+    setWhyWrong(saved?.whyWrong||null);
+  },[current,q.id,quizState.answers]);
 
   const toggleArabic=async()=>{
     if(!arabicOn){
@@ -460,21 +548,48 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
   };
 
   const submit=()=>{
-    if(selected===null)return;
+    if(selected===null||submitted)return;
     setSubmitted(true);
     const isCorrect=selected===q.correct;
-    updateProgress(q.id,isCorrect,q.category);
-    const newAnswers=[...answers,{qId:q.id,selected,correct:isCorrect,category:q.category}];
+    const alreadyAnswered=answers.some(a=>a.qId===q.id);
+    if(!alreadyAnswered)updateProgress(q.id,isCorrect,q.category);
+    const answer={qId:q.id,selected,correct:isCorrect,category:q.category};
+    const newAnswers=alreadyAnswered?answers.map(a=>a.qId===q.id?answer:a):[...answers,answer];
     setAnswers(newAnswers);
-    setQuizState(prev=>({...prev,answers:newAnswers}));
+    setQuizState(prev=>{
+      const updated={...prev,answers:newAnswers};
+      saveActiveQuiz(updated);
+      return updated;
+    });
+  };
+
+  const goToQuestion=(index)=>{
+    setQuizState(prev=>{
+      const updated={...prev,current:index};
+      saveActiveQuiz(updated);
+      return updated;
+    });
   };
 
   const next=()=>{
     if(current+1>=questions.length){
       onEnd(answers);
     }else{
-      setQuizState(prev=>({...prev,current:prev.current+1}));
+      goToQuestion(current+1);
     }
+  };
+
+  const previous=()=>{
+    if(current>0)goToQuestion(current-1);
+  };
+
+  const resetQuiz=()=>{
+    if(answers.length>0&&!window.confirm("Reset this quiz and clear its saved answers?"))return;
+    const resetState={...quizState,current:0,answers:[],sessionStart:Date.now()};
+    resetActiveQuiz(quizState.quizKey,answers);
+    setAnswers([]);
+    setQuizState(resetState);
+    saveActiveQuiz(resetState);
   };
 
   const simplify=async()=>{
@@ -483,6 +598,13 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
     try{
       const s=await callOpenAI(`Rewrite this corrections officer exam explanation in very simple plain English. Keep it under 3 sentences. Original: "${explanation}"`,apiKey);
       setSimplifiedExplanation(s);
+      const newAnswers=answers.map(a=>a.qId===q.id?{...a,simplifiedExplanation:s}:a);
+      setAnswers(newAnswers);
+      setQuizState(prev=>{
+        const updated={...prev,answers:newAnswers};
+        saveActiveQuiz(updated);
+        return updated;
+      });
     }catch(e){}
     setLoadingSimplify(false);
   };
@@ -493,6 +615,13 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
     try{
       const w=await callOpenAI(`A corrections officer exam student answered this question:\n\nQuestion: ${q.question}\nTheir answer: ${q.options[selected]}\nCorrect answer: ${q.options[q.correct]}\n\nIn 2-3 sentences, explain specifically why their chosen answer was wrong and what mistake in thinking they made. Be direct and educational.`,apiKey);
       setWhyWrong(w);
+      const newAnswers=answers.map(a=>a.qId===q.id?{...a,whyWrong:w}:a);
+      setAnswers(newAnswers);
+      setQuizState(prev=>{
+        const updated={...prev,answers:newAnswers};
+        saveActiveQuiz(updated);
+        return updated;
+      });
     }catch(e){}
     setLoadingWhyWrong(false);
   };
@@ -506,6 +635,7 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
           {mode==="drill"?"Weak Area Drill":mode==="category"?`${CATEGORIES[q.category]}`:"All Questions"}
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <button className="btn btn-secondary btn-sm" onClick={resetQuiz}>Reset Quiz</button>
           <button className={`btn btn-arabic btn-sm ${arabicOn?"active":""}`} onClick={toggleArabic} disabled={loadingArabic}>
             {loadingArabic?<span className="spinner"/>:"عربي"}
           </button>
@@ -516,7 +646,9 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
       <div className="progress-bar">
         <div className="progress-fill" style={{width:`${pct}%`}}/>
       </div>
-      <div style={{fontSize:13,color:"#667085",marginBottom:18}}>Question {current+1} of {questions.length}</div>
+      <div style={{fontSize:13,color:"#667085",marginBottom:18}}>
+        Question {current+1} of {questions.length} · {answers.length} answered
+      </div>
 
       <div style={{marginBottom:8}}>
         <span className="badge badge-blue" style={{marginBottom:12}}>{CATEGORIES[q.category]}</span>
@@ -542,9 +674,12 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
         })}
       </div>
 
-      {!submitted&&<button className="btn btn-primary" style={{width:"100%",justifyContent:"center"}} onClick={submit} disabled={selected===null}>
-        Submit Answer
-      </button>}
+      {!submitted&&<div style={{display:"flex",gap:12}}>
+        {current>0&&<button className="btn btn-secondary" style={{flex:1,justifyContent:"center"}} onClick={previous}>Previous</button>}
+        <button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={submit} disabled={selected===null}>
+          Submit Answer
+        </button>
+      </div>}
 
       {submitted&&<div className={`explanation-box ${isCorrect?"":"wrong"}`}>
         <div style={{fontWeight:700,fontSize:16,marginBottom:8,color:isCorrect?"#1f7a4d":"#b42318"}}>
@@ -569,9 +704,12 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd
         </div>}
       </div>}
 
-      {submitted&&<button className="btn btn-primary" style={{width:"100%",justifyContent:"center",marginTop:16}} onClick={next}>
-        {current+1>=questions.length?"See Results":"Next Question"}
-      </button>}
+      {submitted&&<div style={{display:"flex",gap:12,marginTop:16}}>
+        <button className="btn btn-secondary" style={{flex:1,justifyContent:"center",opacity:current===0?0.45:1}} onClick={previous} disabled={current===0}>Previous</button>
+        <button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={next}>
+          {current+1>=questions.length?"See Results":"Next Question"}
+        </button>
+      </div>}
     </div>
   );
 }
@@ -769,7 +907,7 @@ function Settings({apiKey,setApiKey,progress,setProgress,onBack}){
         {!resetConfirm?<button className="btn btn-secondary btn-sm" style={{color:"#b42318",borderColor:"#f5d0ca"}} onClick={()=>setResetConfirm(true)}>Reset All Progress</button>:
         <div>
           <div style={{fontSize:14,color:"#b42318",marginBottom:10}}>Are you sure? This cannot be undone.</div>
-          <button className="btn btn-sm" style={{background:"#b42318",color:"#fff",border:"none",marginRight:8}} onClick={()=>{setProgress({lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{}});setResetConfirm(false);}}>Yes, Reset</button>
+          <button className="btn btn-sm" style={{background:"#b42318",color:"#fff",border:"none",marginRight:8}} onClick={()=>{setProgress(getDefaultProgress());setResetConfirm(false);}}>Yes, Reset</button>
           <button className="btn btn-ghost btn-sm" onClick={()=>setResetConfirm(false)}>Cancel</button>
         </div>}
       </div>
