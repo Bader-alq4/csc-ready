@@ -203,11 +203,11 @@ function loadProgress(){
 }
 
 function getDefaultProgress(){
-  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{},activeQuizzes:{}};
+  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{},activeQuizzes:{},activeDilemmas:{current:null,answers:[]}};
 }
 
 function normalizeProgress(progress){
-  return{...getDefaultProgress(),...progress,activeQuizzes:progress?.activeQuizzes||{}};
+  return{...getDefaultProgress(),...progress,activeQuizzes:progress?.activeQuizzes||{},activeDilemmas:progress?.activeDilemmas||{current:null,answers:[]}};
 }
 
 function saveProgress(p){
@@ -387,6 +387,14 @@ function App(){
     });
   };
 
+  const saveActiveDilemmas=(state)=>{
+    setProgress(prev=>({...prev,activeDilemmas:{current:state.current,answers:state.answers||[]}}));
+  };
+
+  const resetActiveDilemmas=()=>{
+    setProgress(prev=>({...prev,activeDilemmas:{current:null,answers:[]}}));
+  };
+
   const startQuiz=(mode,category=null,forceNew=false)=>{
     const quizKey=getQuizKey(mode,category);
     const restored=!forceNew?restoreQuiz(progress.activeQuizzes?.[quizKey]):null;
@@ -415,8 +423,13 @@ function App(){
   if(showSettings)return<Settings apiKey={apiKey} setApiKey={setApiKey} progress={progress} setProgress={setProgress} onBack={()=>setShowSettings(false)}/>;
   if(screen==="quiz"&&quizState)return<QuizScreen quizState={quizState} setQuizState={setQuizState} apiKey={apiKey} updateProgress={updateProgress} progress={progress} saveActiveQuiz={saveActiveQuiz} resetActiveQuiz={resetActiveQuiz} onEnd={(results)=>{setScreen("results");setQuizState(prev=>({...prev,results}));}} onHome={()=>setScreen("home")}/>;
   if(screen==="results"&&quizState?.results)return<ResultsScreen results={quizState.results} mode={quizState.mode} apiKey={apiKey} onDrill={()=>startQuiz("drill")} onHome={()=>setScreen("home")}/>;
-  if(screen==="dilemmas")return<DilemmasScreen apiKey={apiKey} onHome={()=>setScreen("home")}/>;
+  if(screen==="dilemmas")return<DilemmasScreen apiKey={apiKey} progress={progress} saveActiveDilemmas={saveActiveDilemmas} resetActiveDilemmas={resetActiveDilemmas} onHome={()=>setScreen("home")}/>;
   if(screen==="category")return<CategorySelect onSelect={(cat)=>startQuiz("category",cat)} onHome={()=>setScreen("home")} progress={progress}/>;
+
+  const activeDrill=progress.activeQuizzes?.drill;
+  const drillDisabled=!activeDrill&&progress.wrongQuestions.length===0;
+  const drillLabel=activeDrill?"Continue Weak Areas":"Drill Weak Areas";
+  const drillBadge=activeDrill?`${activeDrill.answers?.length||0}/${activeDrill.questionIds?.length||0}`:progress.wrongQuestions.length;
 
   return(
     <div className="app">
@@ -461,10 +474,10 @@ function App(){
       <div className="grid-2" style={{marginBottom:32}}>
         <button className="btn btn-primary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("category")}>Quiz by Category</button>
         <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>startQuiz("all")}>{progress.activeQuizzes?.all?"Continue All Questions":"All Questions"}</button>
-        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px",opacity:progress.wrongQuestions.length===0?0.4:1}} onClick={()=>startQuiz("drill")} disabled={progress.wrongQuestions.length===0}>
-          {progress.activeQuizzes?.drill?"Continue Weak Areas":"Drill Weak Areas"} {progress.wrongQuestions.length>0&&<span className="badge badge-red">{progress.wrongQuestions.length}</span>}
+        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px",opacity:drillDisabled?0.4:1}} onClick={()=>startQuiz("drill")} disabled={drillDisabled}>
+          {drillLabel} {(activeDrill||drillBadge>0)&&<span className={`badge ${activeDrill?"badge-blue":"badge-red"}`}>{drillBadge}</span>}
         </button>
-        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("dilemmas")}>Dilemma Scenarios</button>
+        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("dilemmas")}>{progress.activeDilemmas?.answers?.length||progress.activeDilemmas?.current!==null?"Continue Dilemma Scenarios":"Dilemma Scenarios"}</button>
       </div>
     </div>
   );
@@ -781,8 +794,10 @@ function ResultsScreen({results,mode,apiKey,onDrill,onHome}){
   );
 }
 
-function DilemmasScreen({apiKey,onHome}){
-  const [current,setCurrent]=useState(null);
+function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,onHome}){
+  const savedDilemmas=progress.activeDilemmas||{current:null,answers:[]};
+  const [current,setCurrent]=useState(savedDilemmas.current??null);
+  const [answers,setAnswers]=useState(savedDilemmas.answers||[]);
   const [selected,setSelected]=useState(null);
   const [submitted,setSubmitted]=useState(false);
   const [arabicOn,setArabicOn]=useState(false);
@@ -790,6 +805,41 @@ function DilemmasScreen({apiKey,onHome}){
   const [loadingArabic,setLoadingArabic]=useState(false);
 
   const d=current!==null?DILEMMAS[current]:null;
+
+  useEffect(()=>{
+    if(current===null)return;
+    const saved=answers.find(a=>a.id===d?.id);
+    setSelected(saved?.selected??null);
+    setSubmitted(Boolean(saved));
+    setArabicOn(false);
+    setArabic({});
+  },[current,d?.id,answers]);
+
+  const goToScenario=(index)=>{
+    setCurrent(index);
+    saveActiveDilemmas({current:index,answers});
+  };
+
+  const submitScenario=()=>{
+    if(selected===null||!d)return;
+    const answer={id:d.id,selected,correct:selected===d.correct};
+    const newAnswers=answers.some(a=>a.id===d.id)?answers.map(a=>a.id===d.id?answer:a):[...answers,answer];
+    setAnswers(newAnswers);
+    setSubmitted(true);
+    saveActiveDilemmas({current,answers:newAnswers});
+  };
+
+  const resetScenarios=()=>{
+    if(answers.length>0&&!window.confirm("Reset scenario answers and start over?"))return;
+    setCurrent(0);
+    setAnswers([]);
+    setSelected(null);
+    setSubmitted(false);
+    setArabicOn(false);
+    setArabic({});
+    resetActiveDilemmas();
+    saveActiveDilemmas({current:0,answers:[]});
+  };
 
   const toggleArabic=async()=>{
     if(!arabicOn&&d&&apiKey){
@@ -816,22 +866,25 @@ function DilemmasScreen({apiKey,onHome}){
       <div style={{marginBottom:22,fontSize:15,color:"#667085",lineHeight:1.7,maxWidth:760}}>
         These are detailed scenario analyses based on real corrections dilemmas. Read the full situation, choose the best approach, and learn why using the 5 Core Competencies.
       </div>
-      {DILEMMAS.map((d,i)=>(
-        <div key={d.id} className="card" style={{marginBottom:16,cursor:"pointer"}} onClick={()=>{setCurrent(i);setSelected(null);setSubmitted(false);setArabicOn(false);setArabic({});}}>
+      {DILEMMAS.map((d,i)=>{
+        const saved=answers.find(a=>a.id===d.id);
+        return <div key={d.id} className="card" style={{marginBottom:16,cursor:"pointer"}} onClick={()=>goToScenario(i)}>
           <div style={{fontSize:12,color:"#1f4e79",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:10}}>Scenario {i+1}</div>
           <div style={{fontSize:17,fontWeight:600,marginBottom:8}}>{d.title}</div>
           <div style={{fontSize:14,color:"#667085",lineHeight:1.65}}>{d.scenario.slice(0,120)}...</div>
+          {saved&&<span className={`badge ${saved.correct?"badge-green":"badge-red"}`} style={{marginTop:12}}>{saved.correct?"Answered correctly":"Answered incorrectly"}</span>}
           <div className="competency-tag" style={{marginTop:10}}>Competency {d.competency}: {COMPETENCIES[d.competency]}</div>
-        </div>
-      ))}
+        </div>;
+      })}
     </div>
   );
 
   return(
     <div className="app">
       <div className="top-bar">
-        <div style={{fontSize:13,color:"#667085",fontWeight:600}}>Scenario {current+1} of {DILEMMAS.length}</div>
+        <div style={{fontSize:13,color:"#667085",fontWeight:600}}>Scenario {current+1} of {DILEMMAS.length} · {answers.length} answered</div>
         <div style={{display:"flex",gap:8}}>
+          <button className="btn btn-secondary btn-sm" onClick={resetScenarios}>Reset Scenarios</button>
           <button className={`btn btn-arabic btn-sm ${arabicOn?"active":""}`} onClick={toggleArabic} disabled={loadingArabic}>
             {loadingArabic?<span className="spinner"/>:"عربي"}
           </button>
@@ -860,9 +913,12 @@ function DilemmasScreen({apiKey,onHome}){
         </div>;
       })}
 
-      {!submitted&&<button className="btn btn-primary" style={{width:"100%",justifyContent:"center",marginTop:8}} onClick={()=>selected!==null&&setSubmitted(true)} disabled={selected===null}>
-        Submit
-      </button>}
+      {!submitted&&<div style={{display:"flex",gap:12,marginTop:8}}>
+        {current>0&&<button className="btn btn-secondary" style={{flex:1,justifyContent:"center"}} onClick={()=>goToScenario(current-1)}>Previous</button>}
+        <button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={submitScenario} disabled={selected===null}>
+          Submit
+        </button>
+      </div>}
 
       {submitted&&<div className={`explanation-box ${selected===d.correct?"":"wrong"}`}>
         <div style={{fontWeight:700,color:selected===d.correct?"#1f7a4d":"#b42318",marginBottom:8}}>
@@ -873,7 +929,8 @@ function DilemmasScreen({apiKey,onHome}){
       </div>}
 
       {submitted&&<div style={{display:"flex",gap:12,marginTop:16}}>
-        {current<DILEMMAS.length-1&&<button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={()=>{setCurrent(current+1);setSelected(null);setSubmitted(false);setArabicOn(false);setArabic({});}}>Next Scenario</button>}
+        <button className="btn btn-secondary" style={{flex:1,justifyContent:"center",opacity:current===0?0.45:1}} onClick={()=>goToScenario(current-1)} disabled={current===0}>Previous</button>
+        {current<DILEMMAS.length-1&&<button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={()=>goToScenario(current+1)}>Next Scenario</button>}
         <button className="btn btn-secondary" style={{flex:1,justifyContent:"center"}} onClick={()=>setCurrent(null)}>All Scenarios</button>
       </div>}
     </div>
