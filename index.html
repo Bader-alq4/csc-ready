@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CSC Ready — Corrections Officer Exam Prep</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f7fa;
+  --surface:#ffffff;
+  --surface-2:#eef2f6;
+  --ink:#17202c;
+  --muted:#667085;
+  --line:#d7dee8;
+  --line-strong:#b8c2cf;
+  --primary:#1f4e79;
+  --primary-hover:#173c5e;
+  --success:#1f7a4d;
+  --warning:#9a6700;
+  --danger:#b42318;
+}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px}
+.app{max-width:1060px;margin:0 auto;padding:42px 28px 56px;min-height:100vh}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2.4px;color:var(--primary);text-transform:uppercase;margin-bottom:6px}
+.tagline{font-size:14px;color:var(--muted);margin-bottom:36px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:28px;box-shadow:0 12px 32px rgba(16,24,40,.05)}
+.card-sm{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;font-family:'IBM Plex Sans',sans-serif}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
+.btn-secondary:hover{background:var(--surface-2);border-color:#98a2b3}
+.btn-ghost{background:transparent;color:var(--primary);border-color:var(--line)}
+.btn-ghost:hover{background:var(--surface)}
+.btn-arabic{background:var(--surface);color:var(--primary);border-color:var(--line-strong);font-size:15px;padding:9px 16px}
+.btn-arabic:hover{background:var(--surface-2)}
+.btn-arabic.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:6px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.progress-bar{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;margin-bottom:22px}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s}
+.score-green{color:var(--success)}
+.score-yellow{color:var(--warning)}
+.score-red{color:var(--danger)}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.badge-blue{background:#e7eef5;color:var(--primary)}
+.badge-green{background:#e7f3ed;color:var(--success)}
+.badge-red{background:#fdeceb;color:var(--danger)}
+.badge-yellow{background:#fff4d7;color:var(--warning)}
+.badge-purple{background:#e7eef5;color:var(--primary)}
+.answer-btn{width:100%;text-align:left;padding:18px 20px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:16px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s;margin-bottom:12px;line-height:1.55}
+.answer-btn:hover:not(:disabled){border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,78,121,.08)}
+.answer-btn.selected-correct{border-color:var(--primary);background:#eef5fb;color:var(--ink)}
+.answer-btn.selected-wrong{border-color:var(--danger);background:#fff4f2;color:var(--ink)}
+.answer-btn.show-correct{border-color:var(--success);background:#f0faf5;color:var(--ink)}
+.answer-btn:disabled{cursor:default}
+.explanation-box{margin-top:24px;padding:22px;border-radius:8px;border-left:4px solid var(--success);background:#f6fbf8;border-top:1px solid #d8ede2;border-right:1px solid #d8ede2;border-bottom:1px solid #d8ede2}
+.explanation-box.wrong{border-left-color:var(--danger);background:#fff8f7;border-top-color:#f5d0ca;border-right-color:#f5d0ca;border-bottom-color:#f5d0ca}
+.arabic-text{direction:rtl;text-align:right;font-size:18px;line-height:1.8;color:#334155;margin-bottom:10px}
+.english-text{direction:ltr;text-align:left;font-size:14px;color:var(--muted);margin-top:4px}
+.category-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:24px;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s;text-align:left}
+.category-card:hover{border-color:var(--primary);box-shadow:0 12px 24px rgba(16,24,40,.07)}
+.category-icon{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px;gap:20px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #ffffff66;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.session-report{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;margin-top:24px;box-shadow:0 10px 26px rgba(16,24,40,.04)}
+.divider{height:1px;background:var(--line);margin:24px 0}
+.ai-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--primary);transition:background .15s,border-color .15s;font-family:'IBM Plex Sans',sans-serif}
+.ai-btn:hover{background:var(--surface-2);border-color:var(--primary)}
+.competency-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;background:#e7eef5;color:var(--primary);margin-top:8px}
+@media(max-width:760px){
+  .app{padding:28px 18px 44px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .top-bar{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback,useRef}=React;
+
+// Optional fallback only. For normal use, enter the key in Settings.
+const OPENAI_KEY="YOUR_OPENAI_API_KEY_HERE";
+
+const CATEGORIES={
+  EMERGENCY:"Emergency Response",
+  SECURITY:"Security & Access",
+  INMATE:"Inmate Management",
+  TRANSPORT:"Transport Security",
+  CONDUCT:"Professional Conduct"
+};
+
+const COMPETENCIES={
+  1:"Public Safety",
+  2:"Accountability",
+  3:"Relationships",
+  4:"Problem Solving",
+  5:"Personal Development"
+};
+
+const QUESTIONS=[
+  {id:1,category:"SECURITY",question:"While on duty, you notice an individual attempting to gain unauthorized access to the building. What should be your immediate response?",options:["Confront the individual and demand identification","Ignore the individual and continue with your duties","Escort the individual out of the premises","Secure the area and notify the appropriate authorities"],correct:0,explanation:"Confronting the individual and asking for identification is the best immediate response. It directly addresses the security threat professionally without escalating unnecessarily. Ignoring risks a breach; escorting out before identifying could be unsafe; securing the area is the right call only if the threat is active.",competency:1},
+  {id:2,category:"SECURITY",question:"A major security breach has occurred, requiring an emergency lock-down. What should be your immediate response?",options:["Evacuate the facility and seek assistance from external authorities","Inform staff members and initiate the lock-down procedure","Attempt to apprehend the individuals responsible for the breach","Continue regular activities and ignore the security breach"],correct:1,explanation:"Informing staff and initiating lock-down ensures safety and security of all staff, inmates, and the institution. It allows prompt implementation of security measures, demonstrates adherence to emergency protocols, and minimizes risk of further harm.",competency:1},
+  {id:3,category:"INMATE",question:"An offender consistently fails to attend mandatory counseling sessions. What should be your immediate response?",options:["Ignore the non-compliance and hope the offender improves","Reduce the level of supervision for the offender","Document the non-compliance and report it to the supervisor","Provide a verbal warning to the offender"],correct:2,explanation:"Documenting and reporting to the supervisor ensures the non-compliance is properly recorded and addressed. A verbal warning alone is insufficient since the scenario says they consistently fail. Documentation allows supervisors to take appropriate action and shows commitment to offender accountability.",competency:2},
+  {id:4,category:"SECURITY",question:"During a routine inspection, you discover a suspicious package in a public area of the institution. What should be your immediate response?",options:["Examine the exterior of the package closely","Disregard the package and continue with your inspection","Evacuate the area and inform the appropriate authorities","Open the package to investigate its contents"],correct:2,explanation:"Evacuating the area and informing authorities ensures safety and allows trained professionals to assess the threat. Never examine or open a suspicious package as it could be dangerous.",competency:1},
+  {id:5,category:"INMATE",question:"While monitoring the visitation area, you witness a heated argument between an inmate and their visitor. What should be your immediate response?",options:["Call for backup and request assistance from fellow officers","Ignore the situation and allow it to resolve on its own","Escort the visitor out of the facility immediately","Intervene physically to separate the individuals involved"],correct:0,explanation:"Calling for backup ensures the safety of staff, inmates, and visitors by involving additional support before intervening. Physical intervention without backup is dangerous; ignoring risks escalation.",competency:1},
+  {id:6,category:"INMATE",question:"You observe an offender engaging in unauthorized communication with another offender, violating facility rules. What should be your immediate response?",options:["Overlook the violation as long as it doesn't escalate","Report the rule violation to the appropriate authorities","Inform other staff members, but take no further action","Confront the offenders and administer disciplinary measures"],correct:1,explanation:"Reporting to authorities ensures the violation is properly addressed and documented. It upholds offender accountability and facility safety, allows disciplinary measures to be taken appropriately, and sets a precedent that minimizes future violations.",competency:2},
+  {id:7,category:"INMATE",question:"An offender consistently demonstrates positive behavior and actively participates in rehabilitative programs. What should be your immediate response?",options:["Assign additional responsibilities to the offender","Ignore the positive behavior as it is expected","Reduce supervision and monitoring for the offender","Acknowledge and praise the offender for their efforts"],correct:3,explanation:"Acknowledging and praising positive behavior reinforces it and motivates the offender to continue. It acknowledges their rehabilitation journey, encourages a positive environment, and promotes accountability and recognition.",competency:3},
+  {id:8,category:"SECURITY",question:"An offender consistently violates facility rules by engaging in contraband activities. What should be your immediate response?",options:["Report the violations to the appropriate authorities","Allow the offender to continue their activities without intervention","Conduct a thorough search of the offender's belongings","Issue a formal warning to the offender"],correct:0,explanation:"Reporting violations ensures they are properly documented and addressed. It allows authorities to take disciplinary measures, upholds accountability and facility security, and minimizes further contraband activities.",competency:2},
+  {id:9,category:"EMERGENCY",question:"While interacting with inmates, you notice an individual experiencing a seizure on the floor. What should be your immediate response?",options:["Call for emergency medical services (EMS) immediately","Call for EMS and apply basic first aid","Apply basic first aid - getting the inmate comfortable, removing obstacles","Attempt to physically restrain the inmate to prevent injury"],correct:0,explanation:"In any medical emergency, always call for professional help first. EMS are trained to handle seizures properly. Physical restraint during a seizure can cause injury.",competency:1},
+  {id:10,category:"EMERGENCY",question:"While on duty, you discover a small fire in an inmate's cell and smoke is starting to fill the area. What should be your immediate response?",options:["Evacuate nearby inmates and secure the area","Activate the facility's fire alarm system and call for backup","Ignore the fire and continue regular duties","Attempt to extinguish the fire using the nearest fire extinguisher"],correct:1,explanation:"Activating the fire alarm alerts everyone and ensures a coordinated response. Calling for backup ensures additional trained personnel respond. Prompt action prevents the fire from spreading.",competency:1},
+  {id:11,category:"EMERGENCY",question:"You receive a report of a hazardous chemical spill in the facility's storage area with a strong odor nearby. What should be your immediate response?",options:["Investigate the spill and attempt to clean it up on your own","Secure the area, isolate the spill, and evacuate nearby individuals","Ignore the report unless the odor becomes more severe","Call for assistance but continue regular duties"],correct:1,explanation:"Securing and evacuating the area protects staff, inmates, and the environment by containing the hazard and removing people from potential harm. Never attempt to clean a chemical spill without proper training and equipment.",competency:1},
+  {id:12,category:"EMERGENCY",question:"While conducting rounds, you find an inmate who is unconscious and not breathing. What should be your immediate response?",options:["Inform the supervisor but continue with your rounds","Initiate CPR on your own","Ignore the situation and move on to the next area","Call for emergency medical services (EMS) immediately"],correct:3,explanation:"Calling EMS immediately ensures trained medical professionals are notified and can provide appropriate care. While waiting, CPR may be initiated if trained, but summoning professional help is always the first step.",competency:1},
+  {id:13,category:"EMERGENCY",question:"While conducting rounds, you come across an inmate clutching their chest and appearing to be in significant pain. What should be your immediate response?",options:["Inform the inmate to wait and seek medical attention later","Call for emergency medical services (EMS) immediately","Apply basic first aid - make the inmate comfortable and loosen clothing","Take the inmate to the infirmary yourself"],correct:1,explanation:"Calling for professional medical help is always the best first option in a potential cardiac emergency. Time is critical in cardiac events.",competency:1},
+  {id:14,category:"CONDUCT",question:"You are new to a large institution that uses software for supervision. You discover 3 colleagues trying to cheat the system. What should you do?",options:["Wait to see if they are good employees first","Immediately report the three colleagues","Report them only if they are absent on Friday","Look the other way as you have no evidence"],correct:1,explanation:"It is the right and ethical thing to do. Failing to report might also put you in trouble. Whether they are lazy or absent is irrelevant — the issue is the cheating behavior which must be reported immediately.",competency:2},
+  {id:15,category:"INMATE",question:"Inmates are randomly shouting requests and you are overwhelmed. What should you do?",options:["Calmly assert order, asking inmates to voice requests one at a time, then address each by urgency","Ignore the requests and walk away","Immediately call for backup because you're feeling overwhelmed","Start shouting back at the inmates to regain control"],correct:0,explanation:"Calmly asserting order demonstrates professionalism and effective communication. Addressing requests by urgency ensures important matters are handled first. Shouting back, ignoring, or calling backup unnecessarily would escalate the situation.",competency:4},
+  {id:16,category:"CONDUCT",question:"An inmate appreciates your work and wants to offer you a job in their company upon their release. What should be your course of action?",options:["Ignore the inmate's offer and continue with your duties","Refuse the offer directly and report the interaction to your supervisor","Ask for more details about the job offer and consider it","Accept the job offer immediately as it seems like a good opportunity"],correct:1,explanation:"It is inappropriate and potentially illegal for correctional officers to engage in personal or business relationships with inmates. Refusing and reporting ensures transparency and preserves professional boundaries necessary in correctional environments.",competency:2},
+  {id:17,category:"CONDUCT",question:"An inmate has made a remark suggesting that you're not fit for the job. How should you respond?",options:["Maintain professionalism, calmly acknowledging the comment and continuing duties","Ignore the comment entirely, showing no reaction","Try to prove the inmate wrong","Respond aggressively, defending your capability"],correct:0,explanation:"Maintaining professionalism is paramount. Calmly acknowledging while continuing duties displays self-control and emotional intelligence. Aggressive response escalates the situation.",competency:5},
+  {id:18,category:"CONDUCT",question:"An inmate consistently calls on you for minor issues, potentially wasting your time. How should you handle this?",options:["Report the inmate's behavior to your supervisor, recommending punishment","Politely reprimand the inmate for constantly bothering you","Ignore the inmate's calls and focus on your other tasks","Communicate with the inmate, explaining you'll address serious concerns but need to balance time"],correct:3,explanation:"Open communication while setting boundaries is the most professional approach. Explaining your position helps the inmate understand appropriate use of your time without being dismissive or punitive.",competency:3},
+  {id:19,category:"EMERGENCY",question:"An inmate approaches you complaining of difficulty breathing and appears to be wheezing. What should be your immediate response?",options:["Apply CPR","Apply basic first aid - loosen clothing","Inform the inmate to wait and seek medical attention later","Call for emergency medical services (EMS) immediately"],correct:3,explanation:"Always call for professional medical help first. CPR is not appropriate for breathing difficulties unless cardiac arrest occurs. Telling the inmate to wait risks their life.",competency:1},
+  {id:20,category:"SECURITY",question:"While monitoring the visitor area, you notice an individual without proper identification attempting to enter. What should be your immediate response?",options:["Confront the individual and demand identification","Deny entry and inform the appropriate authorities","Ignore the situation and continue with your duties","Politely ask what they are doing there"],correct:3,explanation:"The first and best option is non-confrontational. Politely asking is professional and de-escalatory. If that does not resolve it, there is room to move forward with a more assertive approach.",competency:3},
+  {id:21,category:"SECURITY",question:"During routine inspections, you discover a suspicious package in the visitor area. What should be your immediate response?",options:["Disregard the package and continue with your inspection","Radio for assistance","Open the package to investigate its contents","Evacuate the area and inform the appropriate authorities"],correct:3,explanation:"Evacuating and informing authorities is the safest response. Never open or disregard a suspicious package.",competency:1},
+  {id:22,category:"SECURITY",question:"While in the lobby, a visitor becomes verbally aggressive and starts causing a disturbance. What should be your immediate response?",options:["Confront the individual and ask they quiet down","Ignore the situation and hope it resolves on its own","Attempt to physically restrain the visitor","Call for backup and request assistance from fellow officers"],correct:0,explanation:"Confronting in a calm, non-confrontational way is the first best option — then you can escalate if necessary. Immediate physical restraint is excessive.",competency:3},
+  {id:23,category:"SECURITY",question:"You notice an individual attempting unauthorized access and after confronting them, the situation begins to escalate. What should be your response?",options:["Allow the individual to enter to avoid a confrontation","Engage in a physical altercation with the individual","Leave the individual and call for backup","Attempt to de-escalate verbally while maintaining safe distance and notifying relevant authority"],correct:3,explanation:"De-escalating verbally while maintaining distance and calling for backup ensures your safety and others' safety. Physical altercation risks injury; allowing entry compromises security.",competency:4},
+  {id:24,category:"INMATE",question:"An offender consistently fails counseling sessions. You have documented and reported it, but they are still not attending. What should you do?",options:["Ignore the situation as it is the supervisor's responsibility now","Notify the supervisor of the continued non-compliance","Engage the offender in conversation to understand reasons and propose solutions while notifying supervisor","Request a transfer to avoid dealing with the non-compliant offender"],correct:2,explanation:"Engaging the offender in conversation while notifying the supervisor is the best response. Understanding their reasons may reveal barriers to attendance. Combined with proper reporting, this shows genuine commitment to rehabilitation.",competency:3},
+  {id:25,category:"CONDUCT",question:"An inmate falsely accuses you and the two of you get into an extended conflict and antagonistic relationship. How should you handle this?",options:["Attempt to mediate the dispute yourself with the inmate","Seek revenge and retaliate against the inmate","Ignore the conflict and continue working without addressing the issue","Report the situation to the appropriate authorities and request mediation or intervention"],correct:3,explanation:"Reporting and requesting mediation takes proactive steps to resolve the conflict professionally. Revenge or retaliation is never acceptable and could end your career.",competency:2},
+  {id:26,category:"CONDUCT",question:"You are on shift and a very urgent situation develops that you have not handled before. How should you handle it?",options:["Immediately seek guidance from a more experienced colleague or supervisor","Ignore the situation and continue with normal duties","Panic and become overwhelmed, delaying action","Take a moment to assess and make an informed decision based on training"],correct:0,explanation:"Seeking guidance from a more experienced colleague is most effective in unfamiliar urgent situations. It demonstrates knowing your limitations and seeking support — crucial for safe resolution.",competency:4},
+  {id:27,category:"CONDUCT",question:"You are receiving a lot of criticism from inmates. How should you handle the situation?",options:["Ignore the criticism and avoid interaction","Retaliate and respond aggressively","Remain calm and professional, actively listen, and seek constructive dialogue","Respond non-defensively and engage with inmates, trying to see their point of view"],correct:2,explanation:"Remaining calm, listening actively, and seeking constructive dialogue shows professionalism and respect. It allows for meaningful engagement to address concerns.",competency:3},
+  {id:28,category:"INMATE",question:"While conducting rounds, you witness an inmate engaging in a physical altercation with another inmate. How should you handle this?",options:["Ignore the altercation and continue with your rounds","Immediately call for backup and follow established protocols to intervene safely","Join the altercation and use force to break up the fight","Try to verbally intervene and de-escalate without calling for backup"],correct:1,explanation:"Calling for backup and following protocols ensures proper assistance is on the way. Attempting to intervene alone is dangerous. Ignoring risks escalation.",competency:1},
+  {id:29,category:"SECURITY",question:"An inmate requests access to a restricted area without proper authorization. How should you handle this?",options:["Provide access but inform them to obtain authorization later","Deny the request without explanation","Deny the inmate's request and explain the proper authorization process","Allow access without any questioning or verification"],correct:2,explanation:"Denying unauthorized access and explaining the proper authorization process maintains security integrity and educates the inmate on correct procedures.",competency:2},
+  {id:30,category:"INMATE",question:"An inmate approaches you with a complaint regarding their living conditions. How should you handle this?",options:["React defensively, accuse the inmate of exaggerating, and refuse to address concerns","Dismiss the complaint and suggest they speak with another staff member","Refer them to the proper documents","Listen attentively, empathize, and document the concern to initiate appropriate action"],correct:3,explanation:"Listening attentively, empathizing, and documenting demonstrates respect and professionalism. Dismissing or reacting defensively undermines trust and fails your duty of care.",competency:3},
+  {id:31,category:"TRANSPORT",question:"While transporting inmates, you encounter heavy traffic and will be delayed reaching the destination. How should you handle this?",options:["Communicate with appropriate authorities about the delay and follow protocols","Drive at very high speed to make up for lost time","Ignore the delay since it is relatively small","Pull over and attempt to find alternative transportation"],correct:0,explanation:"Communicating with authorities and following protocols ensures proper coordination and maintains safety. Speeding with inmates in custody is dangerous and negligent.",competency:2},
+  {id:32,category:"TRANSPORT",question:"You notice that seat belts in the transport vehicle are not functioning properly. How should you handle this?",options:["Immediately report the issue and refuse to transport until fixed or alternative vehicle provided","Inform the inmates that seat belts are not necessary","Continue transport without addressing the seat belt issue","Proceed with transport, advising inmates to hold onto something"],correct:0,explanation:"The safety of inmates during transport is paramount. Malfunctioning safety equipment must be addressed immediately. Transporting without working seat belts puts lives at risk.",competency:1},
+  {id:33,category:"TRANSPORT",question:"A group of inmates becomes unruly and starts creating a disturbance during transport. How should you handle this?",options:["Follow established protocols to de-escalate, maintain control, and ensure safety","Respond forcefully to regain control and silence the unruly inmates","Abandon the transport vehicle and leave the inmates unattended","Ignore the disturbance and hope it resolves on its own"],correct:0,explanation:"Following de-escalation protocols demonstrates professionalism. Responding forcefully could escalate the situation. Abandoning the vehicle is never acceptable.",competency:4},
+  {id:34,category:"TRANSPORT",question:"One of the inmates becomes ill and displays symptoms of a medical emergency during transport. How should you handle this?",options:["Ignore the situation until you reach the destination","Administer basic first aid and radio for assistance","Immediately call for emergency medical assistance and follow proper procedures","Inform the inmate to endure the discomfort until reaching the destination"],correct:2,explanation:"Immediately calling for emergency medical assistance prioritizes the inmate's health and well-being. Time is critical in medical emergencies — delaying could be fatal.",competency:1},
+  {id:35,category:"SECURITY",question:"While conducting a routine cell inspection, you discover an inmate has concealed a weapon in their cell. How should you handle this?",options:["Point out that the weapon is prohibited and ask for it","Ignore the weapon and continue with the cell inspection","Leave the area without taking any action or reporting the weapon","Immediately secure the area, follow protocols, and notify appropriate authorities"],correct:3,explanation:"A concealed weapon is a significant safety threat. Securing the area and notifying authorities allows for a coordinated response. Simply asking for the weapon without backup is dangerous.",competency:1},
+  {id:36,category:"INMATE",question:"A group of inmates is involved in a physical altercation in a common area. How should you handle this?",options:["Encourage other inmates to join the altercation","Attempt to break up the fight alone without notifying anyone","Immediately call for backup, ensure safety, and follow protocols to intervene and de-escalate","Keeping a safe distance, attempt to establish order verbally"],correct:2,explanation:"Calling for backup and following protocols allows for a coordinated and controlled response. Breaking up a fight alone is dangerous.",competency:1},
+  {id:37,category:"INMATE",question:"An inmate has been demonstrating increasingly aggressive behavior towards both staff and fellow inmates. How should you handle this?",options:["Report the behavior to authorities, document incidents, and collaborate with mental health team","Mimic the inmate's aggressive behavior as a means of establishing authority","Engage in confrontations attempting to control behavior through force or intimidation","Speak with the inmate about their behavior"],correct:0,explanation:"A comprehensive approach — reporting, documenting, and collaborating with mental health — addresses underlying issues. Mimicking aggression or using intimidation is never acceptable.",competency:4},
+  {id:38,category:"EMERGENCY",question:"An inmate is exhibiting signs of distress and appears to be experiencing a medical emergency. How should you handle this?",options:["Perform basic first aid first and when satisfied, call for medical assistance","Delay seeking medical assistance and fail to provide any aid","Attempt to provide medical treatment beyond your training","Immediately call for medical assistance, provide initial aid if trained, and maintain communication with medical professionals"],correct:3,explanation:"Immediately calling for medical assistance while providing initial aid ensures timely professional care. Attempting treatment beyond your training can cause harm.",competency:1},
+  {id:39,category:"SECURITY",question:"During a routine head count, you notice one inmate is missing from their assigned location. How should you handle this?",options:["Assume they will turn up on their own shortly","Do a quick search for the inmate before notifying anyone","Immediately report the missing inmate, initiate a facility-wide search, and activate established protocols","Assume the inmate is temporarily elsewhere and proceed with the head count"],correct:2,explanation:"A missing inmate is a critical situation requiring immediate attention. Reporting and initiating a facility-wide search through established protocols ensures a swift coordinated response.",competency:1},
+  {id:40,category:"SECURITY",question:"While conducting a routine search, you discover unauthorized contraband hidden in an inmate's personal belongings. How should you handle this?",options:["Confiscate the contraband and give a warning this time","Ignore the contraband and proceed with the search","Follow protocols, confiscate the contraband, document the incident thoroughly, and report to authorities","Decide to keep the discovery confidential and not take any action"],correct:2,explanation:"Following protocols and properly documenting ensures institutional security and promotes accountability. Simply confiscating with a warning is insufficient.",competency:2},
+  {id:41,category:"EMERGENCY",question:"During a fire emergency in the corrections facility, what should be the first action of a corrections officer?",options:["Evacuate all inmates immediately","Assess the situation and activate the fire alarm","Attempt to extinguish the fire using available equipment","Inform the security team"],correct:1,explanation:"Assessing the situation and activating the fire alarm ensures the safety of all individuals in the facility before taking further action. The alarm alerts everyone simultaneously and triggers the coordinated emergency response.",competency:1},
+  {id:42,category:"EMERGENCY",question:"When encountering environmental hazards such as a chemical spill, what should a corrections officer do?",options:["Contain the spill using available materials","Call for professional help immediately","Attempt to clean up the spill independently","Ignore the hazard and continue with regular duties"],correct:1,explanation:"Calling for professional help immediately is essential. Chemical spills require specialized training and equipment to handle safely. Attempting to clean it yourself without proper protection risks serious injury.",competency:1},
+  {id:43,category:"EMERGENCY",question:"What is the proper procedure for a corrections officer when an inmate requires immediate medical attention?",options:["Provide first aid if trained to do so","Wait for medical personnel to arrive","Inform the inmate to wait until the next scheduled medical check-up","Ignore the inmate's requests"],correct:0,explanation:"It is important for corrections officers to provide first aid if trained to do so in order to address immediate medical needs. Delaying medical assistance can lead to serious consequences.",competency:1},
+  {id:44,category:"EMERGENCY",question:"How should a corrections officer respond if an inmate complains of feeling unwell due to an unknown cause?",options:["Ask the inmate to tough it out until the next meal","Inform the medical staff immediately","Offer the inmate over-the-counter medication","Ignore the complaint"],correct:1,explanation:"Informing medical staff immediately is essential because the inmate's condition may be serious and necessitate timely evaluation and treatment. Never administer medication without medical authorization.",competency:1},
+  {id:45,category:"CONDUCT",question:"What is the appropriate action for a corrections officer witnessing a fellow officer violating safety protocols during a medical emergency?",options:["Confront the officer immediately","Report the incident to the supervisor afterward","Do nothing to avoid conflict","Join the officer in violating safety protocols"],correct:1,explanation:"Reporting to the supervisor afterward ensures accountability and addresses the breach without further escalating the emergency situation. Doing nothing or joining are unacceptable.",competency:2},
+  {id:46,category:"SECURITY",question:"When an inmate attempts to smuggle contraband into the facility, what should be the immediate response?",options:["Ignore the situation and let the inmate proceed","Report the incident to the supervisor and confiscate the contraband","Assist the inmate in hiding the contraband","Participate in the smuggling process"],correct:1,explanation:"Reporting and confiscating is crucial for maintaining institutional security and preventing potential harm to other inmates and staff.",competency:2},
+  {id:47,category:"SECURITY",question:"If a visitor exhibits suspicious behavior during a routine visit, what should a corrections officer do?",options:["Ignore the behavior and continue with the visit","Politely ask the visitor to leave without further investigation","Notify the appropriate authorities or supervisor about the behavior","Engage in casual conversation to distract the visitor"],correct:2,explanation:"Notifying authorities about suspicious behavior is essential to address potential security threats and protect the institution and public.",competency:1},
+  {id:48,category:"SECURITY",question:"During a routine cell search, a corrections officer finds unauthorized items hidden by an inmate. What is the appropriate action?",options:["Ignore the items and leave the cell as is","Confiscate the items, document the findings, and inform the supervisor","Inform the inmate about the findings and allow them to keep the items","Assist the inmate in concealing the items better"],correct:1,explanation:"Confiscating, documenting, and informing the supervisor are necessary steps to ensure safety and security, prevent further violations, and maintain proper records.",competency:2},
+  {id:49,category:"CONDUCT",question:"If a fellow corrections officer is observed engaging in inappropriate conduct with an inmate, what should be the immediate course of action?",options:["Confront the officer privately and warn them to stop","Report the incident to higher authorities or supervisors immediately","Stay silent and ignore the situation to avoid conflict","Join in the inappropriate conduct to avoid suspicion"],correct:1,explanation:"Reporting to higher authorities immediately is crucial to maintain the integrity of the corrections institution, uphold professional standards, and protect the welfare of inmates.",competency:2},
+  {id:50,category:"SECURITY",question:"When faced with a potential security breach that could endanger lives of inmates and staff, what should a corrections officer prioritize?",options:["Protecting their own safety first before addressing the breach","Ignoring the breach to prevent escalation","Ensuring the safety and security of all individuals within the facility","Alerting the media before taking action"],correct:2,explanation:"Ensuring the safety and security of all individuals should be the top priority in any security breach. This is the core duty of a corrections officer.",competency:1},
+  {id:51,category:"INMATE",question:"Inmate Tony is consistently late for scheduled programs. As a corrections officer, what is the most appropriate action?",options:["Confront Tony in front of other inmates to show authority","Report Tony's behavior to the supervisor","Ignore Tony's tardiness","Assign Tony extra duties as punishment"],correct:1,explanation:"Reporting to the supervisor is correct as it maintains professionalism, follows protocol, and ensures appropriate measures can be taken. Public confrontation is humiliating and unprofessional.",competency:2},
+  {id:52,category:"SECURITY",question:"What should a corrections officer do if an inmate refuses to comply with a security procedure?",options:["Issue a warning","Use physical force","Seek assistance from supervisor","Ignore the refusal"],correct:2,explanation:"Seeking assistance from a supervisor is necessary to handle non-compliance professionally and ensure security measures are followed. Physical force should only be a last resort with proper authorization.",competency:4},
+  {id:53,category:"SECURITY",question:"In the event of a security breach, what is the primary responsibility of a corrections officer?",options:["Notify authorities","Secure the area","Restrain the inmates","Conduct a search"],correct:1,explanation:"Securing the area is the primary responsibility during a security breach to prevent further escalation and ensure the safety of staff and inmates.",competency:1},
+  {id:54,category:"INMATE",question:"During a group therapy session, an inmate becomes disruptive and starts arguing with others. How should the corrections officer handle this?",options:["Physically restrain the inmate immediately","Ask the other inmates to leave the room","Engage in a calm conversation to de-escalate the situation","Ignore the disruptive behavior"],correct:2,explanation:"Engaging in calm conversation to de-escalate is the most effective approach. It can diffuse tension, promote communication, and prevent escalation.",competency:3},
+  {id:55,category:"CONDUCT",question:"An inmate requests to speak with you privately about a personal matter. What is the appropriate course of action?",options:["Deny the request as it violates rules of privacy","Listen to the inmate but refrain from offering any advice","Inform the inmate that all conversations are monitored","Grant the request and have a private conversation in a designated area"],correct:3,explanation:"Granting the request in a designated area builds trust, shows empathy, and addresses personal issues discreetly while maintaining professional boundaries.",competency:3},
+  {id:56,category:"INMATE",question:"An inmate accuses another inmate of stealing his belongings. How should the corrections officer approach this situation?",options:["Punish both inmates to set an example","Ignore the accusation as it may be false","Conduct a thorough investigation to gather evidence","Ask both inmates to solve the issue independently"],correct:2,explanation:"A thorough investigation ensures fairness and allows appropriate actions based on factual information rather than assumptions.",competency:4},
+  {id:57,category:"SECURITY",question:"A visitor attempts to bring in a prohibited item during a security check. What should the corrections officer do?",options:["Allow the visitor to keep the item and enter the facility","Confiscate the item and allow the visitor in","Deny entry to the visitor and inform the supervisor","Ignore the situation and let the visitor pass"],correct:2,explanation:"Denying entry and informing the supervisor addresses the security breach properly. Security of the institution is a top priority.",competency:1},
+  {id:58,category:"INMATE",question:"A conflict arises between two inmates in the facility. How should the corrections officer handle the situation?",options:["Let the inmates resolve the conflict on their own","Intervene immediately to de-escalate the situation","Ignore the conflict and walk away","Report the incident after the conflict has escalated"],correct:1,explanation:"Immediate intervention to de-escalate maintains control and prevents violence. Letting inmates resolve conflicts independently in a corrections environment is unsafe.",competency:1},
+  {id:59,category:"CONDUCT",question:"An inmate requests special privileges in exchange for information on illegal activities within the facility. How should the corrections officer respond?",options:["Agree to the inmate's request to obtain the information","Report the inmate's offer to higher authorities","Keep the information confidential and grant the privileges","Ignore the inmate's request and continue regular duties"],correct:1,explanation:"Reporting to higher authorities upholds ethical standards and proper procedures. Agreeing to exchange privileges for information is unethical and compromises your integrity.",competency:2},
+  {id:60,category:"SECURITY",question:"During a perimeter patrol, a corrections officer notices a breach in the fencing. What is the immediate action to take?",options:["Ignore the breach and continue the patrol","Secure the area and call for backup","Wait until the end of the shift to report the breach","Inform other officers but take no action"],correct:1,explanation:"A fence breach is a serious security risk requiring immediate action. Securing and calling for backup prevents potential escapes or external threats.",competency:1},
+  {id:61,category:"INMATE",question:"What is the first step when dealing with a potentially non-compliant inmate?",options:["Remain calm and assess the situation","Call for backup immediately","Issue a warning to the inmate","Physically restrain the inmate"],correct:0,explanation:"Remaining calm and assessing allows the corrections officer to evaluate the level of risk and determine appropriate action before escalating.",competency:4},
+  {id:62,category:"CONDUCT",question:"When documenting an incident involving an inmate, what information should be included?",options:["Only factual details without opinions","Opinions and personal biases","Information that supports the inmate's perspective","Complete and accurate details of the incident"],correct:3,explanation:"Documenting complete and accurate details ensures transparency and provides an objective record for future reference.",competency:2},
+  {id:63,category:"SECURITY",question:"During a routine cell search, what must a corrections officer prioritize?",options:["Inmate's privacy rights","Speed of the search process","Safety of all individuals involved","Finding contraband at any cost"],correct:2,explanation:"The safety of all individuals — officers and inmates — is paramount during a cell search. Safety takes precedence over speed or thoroughness at all costs.",competency:1},
+  {id:64,category:"INMATE",question:"How should a corrections officer respond to an inmate who is making threats against others?",options:["Ignore the threats unless they become physical","Report the threats to the supervisor immediately","Confront the inmate directly about the threats","Make a note of the threats for future reference"],correct:1,explanation:"Reporting threats immediately allows proper assessment and intervention, ensuring safety of all. Ignoring threats until they become physical is dangerous.",competency:1},
+  {id:65,category:"CONDUCT",question:"What is the importance of maintaining regular communication with inmates?",options:["It helps build positive relationships","It increases the likelihood of escape attempts","It is not necessary for corrections officers","It can lead to favoritism towards certain inmates"],correct:0,explanation:"Regular communication helps build trust, manage conflicts, and promote a safer more constructive environment. Good professional relationships enhance security by enabling better information flow.",competency:3},
+  {id:66,category:"INMATE",question:"An inmate is threatening another inmate with physical harm. What is the most appropriate course of action?",options:["Confront the threatening inmate in front of others","Separate the two inmates and de-escalate the situation","Ignore the situation and let them resolve it themselves","Report the incident to the supervisor immediately"],correct:1,explanation:"Separating and de-escalating prevents immediate harm. Confronting publicly can escalate; ignoring risks violence.",competency:1},
+  {id:67,category:"INMATE",question:"A group of inmates is engaging in disruptive behavior during mealtime. What should the corrections officer do first?",options:["Physically restrain the disruptive inmates","Verbally reprimand the entire group","Inform the inmates of the consequences of their behavior","Seek assistance from other staff members"],correct:2,explanation:"Communicating consequences deters further disruptions and promotes order. Physical restraint is excessive for mealtime disruption.",competency:3},
+  {id:68,category:"INMATE",question:"A new inmate is exhibiting signs of distress and isolation. How can the corrections officer best address this situation?",options:["Avoid interacting with the inmate to respect their privacy","Initiate a conversation with the inmate and offer support or counseling resources","Assign the inmate to solitary confinement to prevent disturbances","Request the inmate's family to intervene"],correct:1,explanation:"Initiating conversation and offering support builds rapport and shows empathy. This can alleviate isolation and promote mental well-being.",competency:3},
+  {id:69,category:"TRANSPORT",question:"What should corrections officers do if there is an unexpected delay during inmate transportation?",options:["Continue without informing anyone","Inform the authorities immediately","Ask the inmates to get off the vehicle","Take a different route"],correct:1,explanation:"Immediate communication with authorities ensures proper protocols are followed and maintains security of the transport.",competency:2},
+  {id:70,category:"TRANSPORT",question:"What is the recommended practice for restraints when transporting inmates by vehicle?",options:["No restraints needed","Loosely applied restraints","Properly secured restraints","Handcuffs only"],correct:2,explanation:"Properly secured restraints ensure the safety and security of both inmates and officers during transportation.",competency:1},
+  {id:71,category:"TRANSPORT",question:"Why is it essential to have a backup communication system during inmate transportation?",options:["To play music","In case the main system fails","To make announcements","To communicate with other vehicles"],correct:1,explanation:"A backup communication system ensures continuous contact and coordination if the primary system fails. Communication is critical during transport for safety and emergency response.",competency:4},
+  {id:72,category:"TRANSPORT",question:"What role does planning play in ensuring the security of inmates during transportation?",options:["No role","Minor role","Supportive role","Critical role"],correct:3,explanation:"Planning plays a critical role in organizing and preparing for safe inmate transportation. It supports implementation of security measures and protocols to safeguard inmates throughout the process.",competency:4}
+];
+
+const DILEMMAS=[
+  {id:"d1",title:"Response to Fire in a Correctional Facility",scenario:"You are the head of security in a correctional facility that has just experienced a fire outbreak in one of the housing units. The fire is spreading rapidly and you face a critical decision. Many inmates are uncooperative — some refuse to leave without a proper head count, others may take this as an opportunity to escape. The building integrity is also at risk. A complete evacuation could lead to chaos and security breaches.",options:["Evacuate Immediately — Direct all inmates to evacuate, risking potential escapes and security breaches","Containment Strategy — Contain the fire while managing evacuation in a controlled manner using lock-down procedures","Call for External Help — Contact fire services and wait before taking any action"],correct:1,explanation:"The Containment Strategy is best. Immediate evacuation protects lives but creates high escape risk and chaos. Calling external help first causes dangerous delays. The containment approach balances life safety with controlled evacuation — deploy staff to guide inmates out in an orderly fashion while simultaneously containing the fire and coordinating with fire services.",competency:4},
+  {id:"d2",title:"Ensuring Safety in a Corrections Institution",scenario:"You are a newly appointed warden of a medium-security corrections institution. Tensions among inmates have escalated due to overcrowding and limited resources. Reports indicate increased violent incidents and gang affiliations. Staff is stretched thin with several positions unfilled, leading to longer shifts and diminished morale.",options:["Increase Security Measures — Implement strict lock-downs, additional cameras, and more officers on duty","Focus on Rehabilitation — Invest in educational programs, vocational training, and counseling services","Balanced Approach — Combine short-term security enhancements with long-term rehabilitation investment"],correct:2,explanation:"The balanced approach is best. Pure security measures may aggravate inmates who feel oppressed. Pure rehabilitation during heightened violence risks immediate safety. The balanced approach addresses both: short-term security enhancements combined with long-term rehabilitation investment.",competency:4},
+  {id:"d3",title:"Balancing Inmate Accountability",scenario:"You are a correctional officer in a medium-security prison dealing with a rising number of incidents where inmates refuse to take responsibility for their actions. There have been several altercations and increased contraband. You must implement a new program for improving inmate accountability.",options:["Strict Punitive Measures — Zero-tolerance policy with immediate disciplinary action including isolation or loss of privileges","Restorative Justice Approach — Dialogue and rehabilitation where inmates discuss their actions and work to make amends"],correct:1,explanation:"The Restorative Justice Approach aligns with corrections' ultimate goal: rehabilitation and reintegration. It fosters understanding, encourages responsibility, and builds relationships. Restorative justice produces long-term benefits — reduced recidivism and genuine behavior change — that outweigh short-term compliance from punitive measures.",competency:5},
+  {id:"d4",title:"Security of Inmates During Transport",scenario:"You are transporting high-risk inmates to a court appearance. One inmate with a history of violent behavior and escape attempts appears unusually agitated. Intelligence indicates a criminal organization may be planning an attack to facilitate this inmate's escape. You face a critical decision about how to proceed.",options:["Prioritize Security Protocols — Follow all established procedures: strict escort, specialized vehicle, full law enforcement coordination","Adjust Protocols for Inmate Welfare — Temporarily relax certain protocols to address the inmate's agitation with fewer restraints"],correct:0,explanation:"Following strict security protocols is essential here. When there is specific intelligence about an escape attempt, the safety of the public, your team, and all inmates must take precedence. Relaxing protocols due to an inmate's agitation — especially one with an escape history and active threat intelligence — creates unacceptable risk.",competency:1}
+];
+
+const STORAGE_KEY="csc_ready_progress_v2";
+const API_KEY_STORAGE_KEY="csc_ready_openai_key_v1";
+
+function loadProgress(){
+  try{
+    const d=localStorage.getItem(STORAGE_KEY);
+    if(d)return JSON.parse(d);
+  }catch(e){}
+  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{}};
+}
+
+function saveProgress(p){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(p));}catch(e){}
+}
+
+function loadApiKey(){
+  try{
+    const stored=localStorage.getItem(API_KEY_STORAGE_KEY);
+    if(stored)return stored;
+  }catch(e){}
+  return OPENAI_KEY==="YOUR_OPENAI_API_KEY_HERE"?"":OPENAI_KEY;
+}
+
+function saveApiKey(key){
+  try{
+    const trimmed=(key||"").trim();
+    if(trimmed)localStorage.setItem(API_KEY_STORAGE_KEY,trimmed);
+    else localStorage.removeItem(API_KEY_STORAGE_KEY);
+  }catch(e){}
+}
+
+async function callOpenAI(prompt,key){
+  const res=await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":`Bearer ${key}`},
+    body:JSON.stringify({model:"gpt-4o-mini",max_tokens:1000,messages:[{role:"system",content:"You are a professional assistant for a Canadian corrections officer exam study app."},{role:"user",content:prompt}]})
+  });
+  const data=await res.json();
+  return data.choices?.[0]?.message?.content||"";
+}
+
+async function translateToArabic(text,key){
+  const res=await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":`Bearer ${key}`},
+    body:JSON.stringify({model:"gpt-4o-mini",max_tokens:800,messages:[{role:"system",content:"You are a professional Arabic translator. Translate the following text to Modern Standard Arabic accurately. This is for a Canadian corrections officer exam study guide. Keep professional corrections officer terminology. Where an English term has no direct Arabic equivalent, include the English word in brackets after the Arabic translation. Return only the translated text, nothing else."},{role:"user",content:text}]})
+  });
+  const data=await res.json();
+  return data.choices?.[0]?.message?.content||"";
+}
+
+function getCatScore(progress,cat){
+  const s=progress.categoryScores[cat];
+  if(!s||s.total===0)return null;
+  return Math.round((s.correct/s.total)*100);
+}
+
+function getScoreColor(pct){
+  if(pct===null)return"#667085";
+  if(pct>=75)return"#1f7a4d";
+  if(pct>=50)return"#9a6700";
+  return"#b42318";
+}
+
+function getScoreBadgeClass(pct){
+  if(pct===null)return"badge-blue";
+  if(pct>=75)return"badge-green";
+  if(pct>=50)return"badge-yellow";
+  return"badge-red";
+}
+
+function App(){
+  const [screen,setScreen]=useState("home");
+  const [progress,setProgress]=useState(loadProgress);
+  const [quizState,setQuizState]=useState(null);
+  const [apiKey,setApiKey]=useState(loadApiKey);
+  const [showSettings,setShowSettings]=useState(false);
+  const [dailyPlan,setDailyPlan]=useState("");
+  const [loadingPlan,setLoadingPlan]=useState(false);
+
+  useEffect(()=>{saveProgress(progress);},[progress]);
+
+  useEffect(()=>{
+    if(screen==="home"&&apiKey&&progress.totalAnswered>0&&!dailyPlan){
+      generateDailyPlan();
+    }
+  },[screen,apiKey]);
+
+  const generateDailyPlan=async()=>{
+    if(!apiKey)return;
+    setLoadingPlan(true);
+    try{
+      const scores=Object.entries(CATEGORIES).map(([k,v])=>{
+        const s=getCatScore(progress,k);
+        return`${v}: ${s===null?"not started yet":`${s}%`}`;
+      }).join(", ");
+      const plan=await callOpenAI(`Based on these scores for a Canadian corrections officer exam student named Salah: ${scores}. Total questions answered: ${progress.totalAnswered}. Write a concise 2-3 sentence personalized daily study recommendation. Be encouraging and specific about what to focus on today. Keep it short and direct.`,apiKey);
+      setDailyPlan(plan);
+    }catch(e){setDailyPlan("");}
+    setLoadingPlan(false);
+  };
+
+  const updateProgress=(qId,correct,category)=>{
+    setProgress(prev=>{
+      const next={...prev};
+      next.totalAnswered=(prev.totalAnswered||0)+1;
+      next.totalCorrect=(prev.totalCorrect||0)+(correct?1:0);
+      next.lastStudied=new Date().toLocaleDateString();
+      if(!next.categoryScores[category])next.categoryScores[category]={correct:0,total:0};
+      next.categoryScores[category]={
+        correct:next.categoryScores[category].correct+(correct?1:0),
+        total:next.categoryScores[category].total+1
+      };
+      if(!correct){
+        if(!next.wrongQuestions.includes(qId))next.wrongQuestions=[...next.wrongQuestions,qId];
+      }else{
+        next.wrongQuestions=next.wrongQuestions.filter(id=>id!==qId);
+      }
+      return next;
+    });
+  };
+
+  const startQuiz=(mode,category=null)=>{
+    let qs;
+    if(mode==="drill"){
+      qs=QUESTIONS.filter(q=>progress.wrongQuestions.includes(q.id));
+      if(qs.length===0){setScreen("home");return;}
+      qs=[...qs].sort(()=>Math.random()-0.5);
+    }else if(mode==="category"&&category){
+      qs=QUESTIONS.filter(q=>q.category===category).sort(()=>Math.random()-0.5);
+    }else{
+      qs=[...QUESTIONS].sort(()=>Math.random()-0.5);
+    }
+    setQuizState({questions:qs,current:0,answers:[],mode,sessionStart:Date.now()});
+    setScreen("quiz");
+  };
+
+  if(showSettings)return<Settings apiKey={apiKey} setApiKey={setApiKey} progress={progress} setProgress={setProgress} onBack={()=>setShowSettings(false)}/>;
+  if(screen==="quiz"&&quizState)return<QuizScreen quizState={quizState} setQuizState={setQuizState} apiKey={apiKey} updateProgress={updateProgress} progress={progress} onEnd={(results)=>{setScreen("results");setQuizState(prev=>({...prev,results}));}} onHome={()=>setScreen("home")}/>;
+  if(screen==="results"&&quizState?.results)return<ResultsScreen results={quizState.results} mode={quizState.mode} apiKey={apiKey} onDrill={()=>startQuiz("drill")} onHome={()=>setScreen("home")}/>;
+  if(screen==="dilemmas")return<DilemmasScreen apiKey={apiKey} onHome={()=>setScreen("home")}/>;
+  if(screen==="category")return<CategorySelect onSelect={(cat)=>startQuiz("category",cat)} onHome={()=>setScreen("home")} progress={progress}/>;
+
+  return(
+    <div className="app">
+      <div className="top-bar">
+        <div>
+          <div className="logo">CSC Ready</div>
+          <div className="tagline">Corrections Officer Exam Prep — built for Salah</div>
+        </div>
+        <button className="btn btn-ghost btn-sm" onClick={()=>setShowSettings(true)}>Settings</button>
+      </div>
+
+      {progress.lastStudied&&<div style={{marginBottom:28,padding:"16px 20px",background:"#ffffff",borderRadius:8,border:"1px solid #d7dee8",fontSize:14,color:"#475467"}}>
+        Welcome back, Salah. Last studied: {progress.lastStudied} &nbsp;·&nbsp; {progress.totalAnswered} questions answered &nbsp;·&nbsp; {progress.totalAnswered>0?Math.round((progress.totalCorrect/progress.totalAnswered)*100):0}% overall
+      </div>}
+
+      {!progress.lastStudied&&<div style={{marginBottom:28,padding:"18px 20px",background:"#ffffff",borderRadius:8,border:"1px solid #d7dee8",fontSize:15,color:"#344054",lineHeight:1.6}}>
+        Welcome, Salah. Start with a practice mode below to continue preparing for the CSC Corrections Officer exam.
+      </div>}
+
+      {(loadingPlan||dailyPlan)&&<div className="session-report" style={{marginBottom:20}}>
+        <div style={{fontSize:12,color:"#1f4e79",fontWeight:700,marginBottom:10,letterSpacing:1,textTransform:"uppercase"}}>
+          Daily Study Plan
+        </div>
+        {loadingPlan?<div style={{color:"#667085",fontSize:14}}>Generating your personalized plan...</div>:<div style={{fontSize:15,color:"#344054",lineHeight:1.7}}>{dailyPlan}</div>}
+      </div>}
+
+      <div style={{marginBottom:34}}>
+        <div style={{fontSize:13,color:"#667085",marginBottom:14,fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}>Your Progress</div>
+        <div className="grid-3">
+          {Object.entries(CATEGORIES).map(([k,v])=>{
+            const pct=getCatScore(progress,k);
+            return<div key={k} className="card-sm" style={{borderColor:pct!==null?getScoreColor(pct)+"55":"#d7dee8"}}>
+              <div style={{fontSize:12,color:"#667085",marginBottom:8,textTransform:"uppercase",letterSpacing:.6}}>{v}</div>
+              <div style={{fontSize:22,fontWeight:700,color:getScoreColor(pct)}}>{pct!==null?`${pct}%`:"—"}</div>
+              {progress.categoryScores[k]&&<div style={{fontSize:12,color:"#667085",marginTop:4}}>{progress.categoryScores[k].correct}/{progress.categoryScores[k].total}</div>}
+            </div>;
+          })}
+        </div>
+      </div>
+
+      <div style={{marginBottom:14,fontSize:13,color:"#667085",fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}>Study Modes</div>
+      <div className="grid-2" style={{marginBottom:32}}>
+        <button className="btn btn-primary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("category")}>Quiz by Category</button>
+        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>startQuiz("all")}>All Questions</button>
+        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px",opacity:progress.wrongQuestions.length===0?0.4:1}} onClick={()=>startQuiz("drill")} disabled={progress.wrongQuestions.length===0}>
+          Drill Weak Areas {progress.wrongQuestions.length>0&&<span className="badge badge-red">{progress.wrongQuestions.length}</span>}
+        </button>
+        <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("dilemmas")}>Dilemma Scenarios</button>
+      </div>
+    </div>
+  );
+}
+
+function CategorySelect({onSelect,onHome,progress}){
+  return(
+    <div className="app">
+      <div className="top-bar">
+        <div className="logo">Select Category</div>
+        <button className="btn btn-ghost btn-sm" onClick={onHome}>Back</button>
+      </div>
+      <div className="grid-2">
+        {Object.entries(CATEGORIES).map(([k,v])=>{
+          const pct=getCatScore(progress,k);
+          const count=QUESTIONS.filter(q=>q.category===k).length;
+          return<div key={k} className="category-card" onClick={()=>onSelect(k)}>
+            <div className="category-icon">{k}</div>
+            <div style={{fontSize:17,fontWeight:700,marginBottom:8,color:"#17202c"}}>{v}</div>
+            <div style={{fontSize:14,color:"#667085",marginBottom:12}}>{count} questions</div>
+            {pct!==null&&<span className={`badge ${getScoreBadgeClass(pct)}`}>{pct}%</span>}
+            {pct===null&&<span className="badge badge-blue">Not started</span>}
+          </div>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,onEnd,onHome}){
+  const {questions,current,mode}=quizState;
+  const q=questions[current];
+  const [selected,setSelected]=useState(null);
+  const [submitted,setSubmitted]=useState(false);
+  const [arabicOn,setArabicOn]=useState(false);
+  const [arabic,setArabic]=useState({question:null,options:[],explanation:null});
+  const [loadingArabic,setLoadingArabic]=useState(false);
+  const [explanation,setExplanation]=useState(q.explanation);
+  const [simplifiedExplanation,setSimplifiedExplanation]=useState(null);
+  const [loadingSimplify,setLoadingSimplify]=useState(false);
+  const [whyWrong,setWhyWrong]=useState(null);
+  const [loadingWhyWrong,setLoadingWhyWrong]=useState(false);
+  const [answers,setAnswers]=useState(quizState.answers||[]);
+  const cacheRef=useRef(progress.arabicCache||{});
+
+  const pct=Math.round(((current)/questions.length)*100);
+
+  useEffect(()=>{
+    setSelected(null);setSubmitted(false);setArabicOn(false);
+    setArabic({question:null,options:[],explanation:null});
+    setExplanation(q.explanation);setSimplifiedExplanation(null);
+    setWhyWrong(null);
+  },[current,q.id]);
+
+  const toggleArabic=async()=>{
+    if(!arabicOn){
+      if(!apiKey){setArabicOn(true);return;}
+      const cacheKey=`q${q.id}`;
+      if(cacheRef.current[cacheKey]){
+        setArabic(cacheRef.current[cacheKey]);
+        setArabicOn(true);return;
+      }
+      setLoadingArabic(true);
+      try{
+        const [tq,...tops]=await Promise.all([
+          translateToArabic(q.question,apiKey),
+          ...q.options.map(o=>translateToArabic(o,apiKey))
+        ]);
+        const te=submitted?await translateToArabic(explanation,apiKey):null;
+        const result={question:tq,options:tops,explanation:te};
+        cacheRef.current[cacheKey]=result;
+        setArabic(result);
+      }catch(e){console.error(e);}
+      setLoadingArabic(false);
+      setArabicOn(true);
+    }else{setArabicOn(false);}
+  };
+
+  const submit=()=>{
+    if(selected===null)return;
+    setSubmitted(true);
+    const isCorrect=selected===q.correct;
+    updateProgress(q.id,isCorrect,q.category);
+    const newAnswers=[...answers,{qId:q.id,selected,correct:isCorrect,category:q.category}];
+    setAnswers(newAnswers);
+    setQuizState(prev=>({...prev,answers:newAnswers}));
+  };
+
+  const next=()=>{
+    if(current+1>=questions.length){
+      onEnd(answers);
+    }else{
+      setQuizState(prev=>({...prev,current:prev.current+1}));
+    }
+  };
+
+  const simplify=async()=>{
+    if(!apiKey)return;
+    setLoadingSimplify(true);
+    try{
+      const s=await callOpenAI(`Rewrite this corrections officer exam explanation in very simple plain English. Keep it under 3 sentences. Original: "${explanation}"`,apiKey);
+      setSimplifiedExplanation(s);
+    }catch(e){}
+    setLoadingSimplify(false);
+  };
+
+  const askWhyWrong=async()=>{
+    if(!apiKey||selected===null)return;
+    setLoadingWhyWrong(true);
+    try{
+      const w=await callOpenAI(`A corrections officer exam student answered this question:\n\nQuestion: ${q.question}\nTheir answer: ${q.options[selected]}\nCorrect answer: ${q.options[q.correct]}\n\nIn 2-3 sentences, explain specifically why their chosen answer was wrong and what mistake in thinking they made. Be direct and educational.`,apiKey);
+      setWhyWrong(w);
+    }catch(e){}
+    setLoadingWhyWrong(false);
+  };
+
+  const isCorrect=submitted&&selected===q.correct;
+
+  return(
+    <div className="app">
+      <div className="top-bar">
+        <div style={{fontSize:13,color:"#667085",fontWeight:600}}>
+          {mode==="drill"?"Weak Area Drill":mode==="category"?`${CATEGORIES[q.category]}`:"All Questions"}
+        </div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <button className={`btn btn-arabic btn-sm ${arabicOn?"active":""}`} onClick={toggleArabic} disabled={loadingArabic}>
+            {loadingArabic?<span className="spinner"/>:"عربي"}
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={onHome}>✕</button>
+        </div>
+      </div>
+
+      <div className="progress-bar">
+        <div className="progress-fill" style={{width:`${pct}%`}}/>
+      </div>
+      <div style={{fontSize:13,color:"#667085",marginBottom:18}}>Question {current+1} of {questions.length}</div>
+
+      <div style={{marginBottom:8}}>
+        <span className="badge badge-blue" style={{marginBottom:12}}>{CATEGORIES[q.category]}</span>
+      </div>
+
+      {arabicOn&&arabic.question&&<div className="arabic-text">{arabic.question}</div>}
+      <div style={{fontSize:22,fontWeight:700,lineHeight:1.5,marginBottom:28,color:arabicOn?"#667085":"#17202c"}}>{q.question}</div>
+
+      <div style={{marginBottom:20}}>
+        {q.options.map((opt,i)=>{
+          let cls="answer-btn";
+          if(submitted){
+            if(i===q.correct)cls+=" show-correct";
+            else if(i===selected)cls+=" selected-wrong";
+          }else if(selected===i)cls+=" selected-correct";
+          return<div key={i}>
+            {arabicOn&&arabic.options[i]&&<div className="arabic-text" style={{fontSize:15,padding:"10px 14px",background:"#eef2f6",borderRadius:"8px 8px 0 0",marginBottom:-2}}>{arabic.options[i]}</div>}
+            <button className={cls} disabled={submitted} onClick={()=>!submitted&&setSelected(i)}>
+              <span style={{color:"#667085",marginRight:10,fontWeight:700}}>{String.fromCharCode(65+i)}.</span>
+              {opt}
+            </button>
+          </div>;
+        })}
+      </div>
+
+      {!submitted&&<button className="btn btn-primary" style={{width:"100%",justifyContent:"center"}} onClick={submit} disabled={selected===null}>
+        Submit Answer
+      </button>}
+
+      {submitted&&<div className={`explanation-box ${isCorrect?"":"wrong"}`}>
+        <div style={{fontWeight:700,fontSize:16,marginBottom:8,color:isCorrect?"#1f7a4d":"#b42318"}}>
+          {isCorrect?"Correct":"Incorrect"}
+        </div>
+        <div className="competency-tag">Competency {q.competency}: {COMPETENCIES[q.competency]}</div>
+        {arabicOn&&arabic.explanation&&<div className="arabic-text" style={{marginTop:12}}>{arabic.explanation}</div>}
+        <div style={{fontSize:15,lineHeight:1.75,color:arabicOn?"#667085":"#344054",marginTop:10}}>
+          {simplifiedExplanation||explanation}
+        </div>
+        <div style={{display:"flex",gap:8,marginTop:12,flexWrap:"wrap"}}>
+          <button className="ai-btn" onClick={simplify} disabled={loadingSimplify}>
+            {loadingSimplify?<span className="spinner"/>:""} Simplify
+          </button>
+          {!isCorrect&&<button className="ai-btn" onClick={askWhyWrong} disabled={loadingWhyWrong}>
+            {loadingWhyWrong?<span className="spinner"/>:""} Why Was I Wrong?
+          </button>}
+        </div>
+        {whyWrong&&<div style={{marginTop:14,padding:"14px 16px",background:"#ffffff",borderRadius:8,fontSize:14,color:"#344054",lineHeight:1.65,border:"1px solid #d7dee8",borderLeft:"3px solid #1f4e79"}}>
+          <div style={{fontSize:11,color:"#1f4e79",fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>Explanation</div>
+          {whyWrong}
+        </div>}
+      </div>}
+
+      {submitted&&<button className="btn btn-primary" style={{width:"100%",justifyContent:"center",marginTop:16}} onClick={next}>
+        {current+1>=questions.length?"See Results":"Next Question"}
+      </button>}
+    </div>
+  );
+}
+
+function ResultsScreen({results,mode,apiKey,onDrill,onHome}){
+  const correct=results.filter(r=>r.correct).length;
+  const total=results.length;
+  const pct=Math.round((correct/total)*100);
+  const [report,setReport]=useState("");
+  const [loadingReport,setLoadingReport]=useState(false);
+
+  useEffect(()=>{
+    if(apiKey)generateReport();
+  },[]);
+
+  const generateReport=async()=>{
+    setLoadingReport(true);
+    try{
+      const catBreakdown=Object.entries(CATEGORIES).map(([k,v])=>{
+        const relevant=results.filter(r=>r.category===k);
+        if(!relevant.length)return null;
+        const c=relevant.filter(r=>r.correct).length;
+        return`${v}: ${c}/${relevant.length}`;
+      }).filter(Boolean).join(", ");
+      const r=await callOpenAI(`A student named Salah just finished a corrections officer exam practice session. Results: ${correct}/${total} (${pct}%). Category breakdown: ${catBreakdown}. Write a 3-4 sentence personalized end-of-session report. Be encouraging, specific about strengths and weaknesses, and give one clear action for next time.`,apiKey);
+      setReport(r);
+    }catch(e){}
+    setLoadingReport(false);
+  };
+
+  return(
+    <div className="app">
+      <div className="top-bar">
+        <div className="logo">Session Complete</div>
+        <button className="btn btn-ghost btn-sm" onClick={onHome}>Home</button>
+      </div>
+      <div className="card" style={{textAlign:"center",marginBottom:20}}>
+        <div style={{fontSize:64,fontWeight:700,color:getScoreColor(pct),marginBottom:8}}>{pct}%</div>
+        <div style={{fontSize:20,color:"#17202c",marginBottom:6,fontWeight:600}}>{correct} out of {total} correct</div>
+        <div style={{fontSize:14,color:"#667085"}}>{pct>=75?"Strong result, Salah.":pct>=50?"Progress is building. Keep focusing the weak areas.":"Continue practicing the priority categories."}</div>
+      </div>
+
+      {(loadingReport||report)&&<div className="session-report" style={{marginBottom:20}}>
+        <div style={{fontSize:12,color:"#1f4e79",fontWeight:700,marginBottom:10,letterSpacing:1,textTransform:"uppercase"}}>Session Report</div>
+        {loadingReport?<div style={{color:"#667085",fontSize:14}}>Generating your report...</div>:<div style={{fontSize:15,color:"#344054",lineHeight:1.7}}>{report}</div>}
+      </div>}
+
+      <div style={{marginBottom:16}}>
+        {Object.entries(CATEGORIES).map(([k,v])=>{
+          const rel=results.filter(r=>r.category===k);
+          if(!rel.length)return null;
+          const c=rel.filter(r=>r.correct).length;
+          const p=Math.round((c/rel.length)*100);
+          return<div key={k} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 0",borderBottom:"1px solid #d7dee8"}}>
+            <div style={{fontSize:14}}>{v}</div>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <div style={{fontSize:13,color:"#667085"}}>{c}/{rel.length}</div>
+              <span className={`badge ${getScoreBadgeClass(p)}`}>{p}%</span>
+            </div>
+          </div>;
+        })}
+      </div>
+
+      <div style={{display:"flex",gap:12}}>
+        <button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={onDrill}>Drill Wrong Answers</button>
+        <button className="btn btn-secondary" style={{flex:1,justifyContent:"center"}} onClick={onHome}>Home</button>
+      </div>
+    </div>
+  );
+}
+
+function DilemmasScreen({apiKey,onHome}){
+  const [current,setCurrent]=useState(null);
+  const [selected,setSelected]=useState(null);
+  const [submitted,setSubmitted]=useState(false);
+  const [arabicOn,setArabicOn]=useState(false);
+  const [arabic,setArabic]=useState({});
+  const [loadingArabic,setLoadingArabic]=useState(false);
+
+  const d=current!==null?DILEMMAS[current]:null;
+
+  const toggleArabic=async()=>{
+    if(!arabicOn&&d&&apiKey){
+      setLoadingArabic(true);
+      try{
+        const [ts,...tops]=await Promise.all([
+          translateToArabic(d.scenario,apiKey),
+          ...d.options.map(o=>translateToArabic(o,apiKey))
+        ]);
+        const te=submitted?await translateToArabic(d.explanation,apiKey):null;
+        setArabic({scenario:ts,options:tops,explanation:te});
+      }catch(e){}
+      setLoadingArabic(false);
+    }
+    setArabicOn(!arabicOn);
+  };
+
+  if(current===null)return(
+    <div className="app">
+      <div className="top-bar">
+        <div><div className="logo">Dilemma Scenarios</div><div className="tagline">Complex real-world corrections decisions</div></div>
+        <button className="btn btn-ghost btn-sm" onClick={onHome}>Back</button>
+      </div>
+      <div style={{marginBottom:22,fontSize:15,color:"#667085",lineHeight:1.7,maxWidth:760}}>
+        These are detailed scenario analyses based on real corrections dilemmas. Read the full situation, choose the best approach, and learn why using the 5 Core Competencies.
+      </div>
+      {DILEMMAS.map((d,i)=>(
+        <div key={d.id} className="card" style={{marginBottom:16,cursor:"pointer"}} onClick={()=>{setCurrent(i);setSelected(null);setSubmitted(false);setArabicOn(false);setArabic({});}}>
+          <div style={{fontSize:12,color:"#1f4e79",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:10}}>Scenario {i+1}</div>
+          <div style={{fontSize:17,fontWeight:600,marginBottom:8}}>{d.title}</div>
+          <div style={{fontSize:14,color:"#667085",lineHeight:1.65}}>{d.scenario.slice(0,120)}...</div>
+          <div className="competency-tag" style={{marginTop:10}}>Competency {d.competency}: {COMPETENCIES[d.competency]}</div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return(
+    <div className="app">
+      <div className="top-bar">
+        <div style={{fontSize:13,color:"#667085",fontWeight:600}}>Scenario {current+1} of {DILEMMAS.length}</div>
+        <div style={{display:"flex",gap:8}}>
+          <button className={`btn btn-arabic btn-sm ${arabicOn?"active":""}`} onClick={toggleArabic} disabled={loadingArabic}>
+            {loadingArabic?<span className="spinner"/>:"عربي"}
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={()=>setCurrent(null)}>Back</button>
+        </div>
+      </div>
+
+      <div style={{fontSize:22,fontWeight:700,marginBottom:16,color:"#17202c"}}>{d.title}</div>
+      <div className="competency-tag" style={{marginBottom:16}}>Competency {d.competency}: {COMPETENCIES[d.competency]}</div>
+
+      {arabicOn&&arabic.scenario&&<div className="arabic-text" style={{marginBottom:8}}>{arabic.scenario}</div>}
+      <div style={{fontSize:15,color:arabicOn?"#667085":"#344054",lineHeight:1.8,marginBottom:28,padding:"20px",background:"#ffffff",borderRadius:8,border:"1px solid #d7dee8"}}>{d.scenario}</div>
+
+      <div style={{fontSize:14,fontWeight:700,color:"#667085",marginBottom:12,textTransform:"uppercase",letterSpacing:.8}}>Choose the best approach</div>
+      {d.options.map((opt,i)=>{
+        let cls="answer-btn";
+        if(submitted){
+          if(i===d.correct)cls+=" show-correct";
+          else if(i===selected)cls+=" selected-wrong";
+        }else if(selected===i)cls+=" selected-correct";
+        return<div key={i}>
+          {arabicOn&&arabic.options?.[i]&&<div className="arabic-text" style={{fontSize:14,padding:"10px 14px",background:"#eef2f6",borderRadius:"8px 8px 0 0",marginBottom:-2}}>{arabic.options[i]}</div>}
+          <button className={cls} disabled={submitted} onClick={()=>!submitted&&setSelected(i)}>
+            <span style={{color:"#667085",marginRight:10,fontWeight:700}}>{String.fromCharCode(65+i)}.</span>{opt}
+          </button>
+        </div>;
+      })}
+
+      {!submitted&&<button className="btn btn-primary" style={{width:"100%",justifyContent:"center",marginTop:8}} onClick={()=>selected!==null&&setSubmitted(true)} disabled={selected===null}>
+        Submit
+      </button>}
+
+      {submitted&&<div className={`explanation-box ${selected===d.correct?"":"wrong"}`}>
+        <div style={{fontWeight:700,color:selected===d.correct?"#1f7a4d":"#b42318",marginBottom:8}}>
+          {selected===d.correct?"Best Approach":"Not the Best Choice"}
+        </div>
+        {arabicOn&&arabic.explanation&&<div className="arabic-text" style={{marginBottom:8}}>{arabic.explanation}</div>}
+        <div style={{fontSize:15,lineHeight:1.75,color:arabicOn?"#667085":"#344054"}}>{d.explanation}</div>
+      </div>}
+
+      {submitted&&<div style={{display:"flex",gap:12,marginTop:16}}>
+        {current<DILEMMAS.length-1&&<button className="btn btn-primary" style={{flex:1,justifyContent:"center"}} onClick={()=>{setCurrent(current+1);setSelected(null);setSubmitted(false);setArabicOn(false);setArabic({});}}>Next Scenario</button>}
+        <button className="btn btn-secondary" style={{flex:1,justifyContent:"center"}} onClick={()=>setCurrent(null)}>All Scenarios</button>
+      </div>}
+    </div>
+  );
+}
+
+function Settings({apiKey,setApiKey,progress,setProgress,onBack}){
+  const [key,setKey]=useState(apiKey);
+  const [resetConfirm,setResetConfirm]=useState(false);
+  const saveKey=()=>{
+    const trimmed=key.trim();
+    saveApiKey(trimmed);
+    setApiKey(trimmed);
+  };
+  return(
+    <div className="app">
+      <div className="top-bar">
+        <div className="logo">Settings</div>
+        <button className="btn btn-ghost btn-sm" onClick={onBack}>Back</button>
+      </div>
+      <div className="card" style={{marginBottom:16}}>
+        <div style={{fontSize:15,fontWeight:600,marginBottom:12}}>OpenAI API Key</div>
+        <div style={{fontSize:13,color:"#667085",marginBottom:12}}>Required for Arabic translation and assisted explanations. Saved on this browser only.</div>
+        <input type="password" value={key} onChange={e=>setKey(e.target.value)} placeholder="sk-..." style={{width:"100%",padding:"12px",background:"#ffffff",border:"1px solid #d7dee8",borderRadius:6,color:"#17202c",fontSize:14,fontFamily:"IBM Plex Mono, monospace",marginBottom:12}}/>
+        <button className="btn btn-primary btn-sm" onClick={saveKey}>Save Key</button>
+        {apiKey&&<span style={{marginLeft:12,color:"#1f7a4d",fontSize:13}}>Key saved</span>}
+      </div>
+      <div className="card" style={{marginBottom:16}}>
+        <div style={{fontSize:15,fontWeight:600,marginBottom:8}}>Progress</div>
+        <div style={{fontSize:14,color:"#667085",marginBottom:12}}>Total answered: {progress.totalAnswered} · Correct: {progress.totalCorrect}</div>
+        {!resetConfirm?<button className="btn btn-secondary btn-sm" style={{color:"#b42318",borderColor:"#f5d0ca"}} onClick={()=>setResetConfirm(true)}>Reset All Progress</button>:
+        <div>
+          <div style={{fontSize:14,color:"#b42318",marginBottom:10}}>Are you sure? This cannot be undone.</div>
+          <button className="btn btn-sm" style={{background:"#b42318",color:"#fff",border:"none",marginRight:8}} onClick={()=>{setProgress({lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{}});setResetConfirm(false);}}>Yes, Reset</button>
+          <button className="btn btn-ghost btn-sm" onClick={()=>setResetConfirm(false)}>Cancel</button>
+        </div>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script>
+</body>
+</html>
