@@ -184,15 +184,537 @@ const QUESTIONS=[
   {id:72,category:"TRANSPORT",question:"What role does planning play in ensuring the security of inmates during transportation?",options:["No role","Minor role","Supportive role","Critical role"],correct:3,explanation:"Planning plays a critical role in organizing and preparing for safe inmate transportation. It supports implementation of security measures and protocols to safeguard inmates throughout the process.",competency:4}
 ];
 
-const DILEMMAS=[
-  {id:"d1",title:"Response to Fire in a Correctional Facility",scenario:"You are the head of security in a correctional facility that has just experienced a fire outbreak in one of the housing units. The fire is spreading rapidly and you face a critical decision. Many inmates are uncooperative — some refuse to leave without a proper head count, others may take this as an opportunity to escape. The building integrity is also at risk. A complete evacuation could lead to chaos and security breaches.",options:["Evacuate Immediately — Direct all inmates to evacuate, risking potential escapes and security breaches","Containment Strategy — Contain the fire while managing evacuation in a controlled manner using lock-down procedures","Call for External Help — Contact fire services and wait before taking any action"],correct:1,explanation:"The Containment Strategy is best. Immediate evacuation protects lives but creates high escape risk and chaos. Calling external help first causes dangerous delays. The containment approach balances life safety with controlled evacuation — deploy staff to guide inmates out in an orderly fashion while simultaneously containing the fire and coordinating with fire services.",competency:4},
-  {id:"d2",title:"Ensuring Safety in a Corrections Institution",scenario:"You are a newly appointed warden of a medium-security corrections institution. Tensions among inmates have escalated due to overcrowding and limited resources. Reports indicate increased violent incidents and gang affiliations. Staff is stretched thin with several positions unfilled, leading to longer shifts and diminished morale.",options:["Increase Security Measures — Implement strict lock-downs, additional cameras, and more officers on duty","Focus on Rehabilitation — Invest in educational programs, vocational training, and counseling services","Balanced Approach — Combine short-term security enhancements with long-term rehabilitation investment"],correct:2,explanation:"The balanced approach is best. Pure security measures may aggravate inmates who feel oppressed. Pure rehabilitation during heightened violence risks immediate safety. The balanced approach addresses both: short-term security enhancements combined with long-term rehabilitation investment.",competency:4},
-  {id:"d3",title:"Balancing Inmate Accountability",scenario:"You are a correctional officer in a medium-security prison dealing with a rising number of incidents where inmates refuse to take responsibility for their actions. There have been several altercations and increased contraband. You must implement a new program for improving inmate accountability.",options:["Strict Punitive Measures — Zero-tolerance policy with immediate disciplinary action including isolation or loss of privileges","Restorative Justice Approach — Dialogue and rehabilitation where inmates discuss their actions and work to make amends"],correct:1,explanation:"The Restorative Justice Approach aligns with corrections' ultimate goal: rehabilitation and reintegration. It fosters understanding, encourages responsibility, and builds relationships. Restorative justice produces long-term benefits — reduced recidivism and genuine behavior change — that outweigh short-term compliance from punitive measures.",competency:5},
-  {id:"d4",title:"Security of Inmates During Transport",scenario:"You are transporting high-risk inmates to a court appearance. One inmate with a history of violent behavior and escape attempts appears unusually agitated. Intelligence indicates a criminal organization may be planning an attack to facilitate this inmate's escape. You face a critical decision about how to proceed.",options:["Prioritize Security Protocols — Follow all established procedures: strict escort, specialized vehicle, full law enforcement coordination","Adjust Protocols for Inmate Welfare — Temporarily relax certain protocols to address the inmate's agitation with fewer restraints"],correct:0,explanation:"Following strict security protocols is essential here. When there is specific intelligence about an escape attempt, the safety of the public, your team, and all inmates must take precedence. Relaxing protocols due to an inmate's agitation — especially one with an escape history and active threat intelligence — creates unacceptable risk.",competency:1}
+const DILEMMAS = [
+{
+  id: 1,
+  title: "Response to Fire in a Correctional Facility",
+  competency: 1,
+
+  scenario: `
+<div style="font-size:13px;font-weight:800;color:#1f4e79;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">
+Context
+</div>
+
+<p style="margin-bottom:18px;">
+Imagine you are the head of security in a correctional facility that has just experienced a fire outbreak in one of the housing units.
+</p>
+
+<p style="margin-bottom:18px;">
+The incident has resulted in an immediate threat to both the safety of the inmates and the integrity of the building.
+</p>
+
+<p style="margin-bottom:28px;">
+You are faced with a critical decision that embodies the ontological dilemma of prioritizing the safety of individuals versus the safety of the facility itself.
+</p>
+
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Description of the Dilemma
+</div>
+
+<p style="margin-bottom:18px;">
+As the head of security, you have two primary responsibilities: ensuring the safety of the inmates and protecting the physical structure of the facility.
+</p>
+
+<p style="margin-bottom:28px;">
+The fire is spreading rapidly, and time is of the essence.
+</p>
+
+<div style="font-size:17px;font-weight:700;color:#17202c;margin-bottom:12px;">
+Safety of Inmates
+</div>
+
+<p style="margin-bottom:18px;">
+Your first instinct is to prioritize the evacuation of the inmates from the affected area.
+</p>
+
+<p style="margin-bottom:18px;">
+This is crucial because their lives are at risk due to smoke inhalation, flames, and potential structural collapse.
+</p>
+
+<p style="margin-bottom:28px;">
+However, many inmates are uncooperative, either due to panic or discontent with authority. Some may refuse to leave their cells without a proper head count, while others could take this as an opportunity to escape.
+</p>
+
+<div style="font-size:17px;font-weight:700;color:#17202c;margin-bottom:12px;">
+Safety of the Building
+</div>
+
+<p>
+On the other hand, the integrity of the building must also be considered. A complete evacuation could lead to chaos and potential breaches of security, putting not only the staff but also other inmates at risk. Moreover, if the fire spreads to other areas of the facility, it could result in a much larger disaster, potentially compromising evidence and causing damage that could take months to repair.
+</p>
+`,
+
+  options: [
+`<div style="font-weight:700;margin-bottom:8px;">Evacuate Immediately</div>
+Direct all inmates to evacuate the building, risking some to potential escapes and security breaches.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">Containment Strategy</div>
+Focus on containing the fire and securing the building while attempting to manage the evacuation in a controlled manner. This may involve using lock-down procedures to prevent inmate escapes.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">Call for External Help</div>
+Contact local fire services and wait for their arrival before taking any action, which could result in delays but might ensure that trained professionals handle the situation.`
+  ],
+
+  correct: 1,
+
+  explanation: `
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Conclusion: The Best Solution
+</div>
+
+<p style="margin-bottom:18px;">
+After weighing the implications of each option, the best solution is to implement a Containment Strategy.
+</p>
+
+<p style="margin-bottom:18px;">
+While immediate evacuation seems to prioritize inmate safety, it poses significant risks of breach and chaos, which could ultimately lead to more harm than good.
+</p>
+
+<p style="margin-bottom:18px;">
+By establishing a controlled evacuation plan while simultaneously working to contain the fire, you can create a safer environment for both inmates and staff.
+</p>
+
+<p>
+This approach allows you to prioritize the physical safety of the inmates while still being vigilant about the security of the facility.
+</p>
+`
+},
+{
+  id: 2,
+  title: "Ensuring Safety in a Corrections Institution",
+  competency: 2,
+
+  scenario: `
+<div style="font-size:13px;font-weight:800;color:#1f4e79;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">
+Scenario
+</div>
+
+<p style="margin-bottom:18px;">
+In a medium-security corrections institution, tensions among inmates have escalated due to overcrowding and limited resources.
+</p>
+
+<p style="margin-bottom:18px;">
+Reports indicate an increase in violent incidents, gang affiliations, and overall inmate unrest.
+</p>
+
+<p style="margin-bottom:18px;">
+The staff is stretched thin, with several positions unfilled, leading to longer shifts and diminished morale among correctional officers.
+</p>
+
+<p style="margin-bottom:28px;">
+As a newly appointed warden, you face a critical decision that could significantly impact the safety of both inmates and staff.
+</p>
+
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+The Dilemma
+</div>
+
+<p style="margin-bottom:20px;">
+You have two primary options to address the escalating safety concerns:
+</p>
+
+<div style="font-size:17px;font-weight:700;color:#17202c;margin-bottom:12px;">
+Increase Security Measures
+</div>
+
+<p style="margin-bottom:18px;">
+Implement strict lockdown procedures, enhance surveillance through additional cameras, and increase the number of correctional officers on duty.
+</p>
+
+<p style="margin-bottom:28px;">
+This approach aims to deter violence and maintain order but may further aggravate tensions among inmates who feel restricted and oppressed by constant surveillance.
+</p>
+
+<div style="font-size:17px;font-weight:700;color:#17202c;margin-bottom:12px;">
+Focus on Rehabilitation and Support Services
+</div>
+
+<p style="margin-bottom:18px;">
+Invest in programs aimed at inmate rehabilitation, such as educational opportunities, vocational training, and counseling services.
+</p>
+
+<p>
+This approach seeks to reduce recidivism and improve overall inmate behavior. However, it requires reallocating funds from security budgets and may lead to criticisms of being too lenient during a time of heightened violence.
+</p>
+`,
+
+  options: [
+`<div style="font-weight:700;margin-bottom:8px;">Increase Security Measures</div>
+Implement strict lockdown procedures, enhance surveillance through additional cameras, and increase the number of correctional officers on duty.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">Focus on Rehabilitation and Support Services</div>
+Invest in programs aimed at inmate rehabilitation, such as educational opportunities, vocational training, and counseling services.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">Balanced Approach</div>
+Combine increased security measures with enhanced rehabilitation and support services to improve both immediate safety and long-term institutional stability.`
+  ],
+
+  correct: 2,
+
+  explanation: `
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Analysis of Safety Concerns
+</div>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Inmate Health and Welfare
+</div>
+
+<p style="margin-bottom:20px;">
+A safe facility must prioritize the physical and psychological well-being of inmates. Increased security measures may lead to mental health deterioration among inmates, particularly if they perceive the environment as oppressive.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Staff Morale and Retention
+</div>
+
+<p style="margin-bottom:20px;">
+High-stress environments with insufficient support can lead to burnout and high turnover rates among correctional officers. Low morale and staff shortages can exacerbate safety issues, as experienced personnel are crucial in managing conflicts and maintaining order.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Community Safety
+</div>
+
+<p style="margin-bottom:20px;">
+The safety of the surrounding community is also at stake. A facility that fails to rehabilitate inmates may contribute to higher recidivism rates, leading to more crime in the community after their release.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Public Perception and Accountability
+</div>
+
+<p style="margin-bottom:28px;">
+The public expects corrections institutions to ensure safety for all involved. Poor management in addressing safety concerns can lead to negative perceptions and decreased trust in the correctional system.
+</p>
+
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Best Solution
+</div>
+
+<p style="margin-bottom:18px;">
+After thorough consideration of both options and the implications of each, the best solution is to implement a balanced approach that combines increased security measures with enhanced rehabilitation and support services.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Short-term Security Enhancements
+</div>
+
+<p style="margin-bottom:20px;">
+Immediately bolster security with additional staff during peak hours and implement de-escalation training for officers to manage conflicts effectively. Install more surveillance equipment to monitor high-risk areas without infringing excessively on inmate privacy.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Long-term Investment in Rehabilitation
+</div>
+
+<p style="margin-bottom:20px;">
+Allocate a portion of the budget towards developing and expanding rehabilitation programs. Engage community organizations to provide educational and vocational opportunities, while also addressing mental health needs.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Stakeholder Engagement
+</div>
+
+<p style="margin-bottom:20px;">
+Involve staff, inmates, and community leaders in discussions about safety and rehabilitation. Open communication channels can help identify issues early and foster a cooperative environment.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Evaluation and Adaptation
+</div>
+
+<p>
+Establish a task force to continuously evaluate the effectiveness of implemented measures. Regular assessments will allow for adjustments based on the evolving dynamics within the institution.
+</p>
+`
+},
+{
+  id: 3,
+  title: "Balancing Inmate Accountability",
+  competency: 3,
+
+  scenario: `
+<div style="font-size:13px;font-weight:800;color:#1f4e79;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">
+Scenario
+</div>
+
+<p style="margin-bottom:18px;">
+You are a correctional officer in a medium-security prison, dealing with a rising number of incidents where inmates refuse to take responsibility for their actions.
+</p>
+
+<p style="margin-bottom:18px;">
+Recently, there have been several altercations among inmates, and reports of contraband being smuggled into the facility have increased.
+</p>
+
+<p style="margin-bottom:28px;">
+As part of your role, you have been tasked with implementing a new program aimed at improving inmate accountability.
+</p>
+
+<p style="margin-bottom:20px;">
+The prison administration provides you with two options to choose from:
+</p>
+
+<div style="font-size:17px;font-weight:700;color:#17202c;margin-bottom:12px;">
+Strict Punitive Measures
+</div>
+
+<p style="margin-bottom:18px;">
+This option involves implementing a zero-tolerance policy towards any misconduct.
+</p>
+
+<p style="margin-bottom:18px;">
+Inmates found engaging in conflicts or possessing contraband would face immediate disciplinary actions, including isolation or loss of privileges.
+</p>
+
+<p style="margin-bottom:28px;">
+The intention is to instill fear of consequences, hoping it will deter negative behavior.
+</p>
+
+<div style="font-size:17px;font-weight:700;color:#17202c;margin-bottom:12px;">
+Restorative Justice Approach
+</div>
+
+<p style="margin-bottom:18px;">
+This option focuses on dialogue and rehabilitation.
+</p>
+
+<p style="margin-bottom:18px;">
+Inmates involved in misconduct would participate in restorative circles where they can discuss their actions, understand their impact on others, and work collaboratively to make amends.
+</p>
+
+<p>
+This approach promotes personal accountability and encourages inmates to reflect on their choices in a supportive environment.
+</p>
+`,
+
+  options: [
+`<div style="font-weight:700;margin-bottom:8px;">Strict Punitive Measures</div>
+Implement a zero-tolerance policy where inmates involved in misconduct immediately face disciplinary actions such as isolation or loss of privileges.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">Restorative Justice Approach</div>
+Encourage dialogue and rehabilitation through restorative circles that help inmates understand the impact of their actions and work collaboratively to make amends.`
+  ],
+
+  correct: 1,
+
+  explanation: `
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+The Dilemma
+</div>
+
+<p style="margin-bottom:18px;">
+You must decide which approach to implement to improve inmate accountability.
+</p>
+
+<p style="margin-bottom:18px;">
+While the strict punitive measures may lead to immediate compliance and a decrease in visible incidents, they could also foster resentment, fear, and an adversarial atmosphere between staff and inmates.
+</p>
+
+<p style="margin-bottom:28px;">
+This might ultimately hinder long-term rehabilitation efforts.
+</p>
+
+<p style="margin-bottom:18px;">
+Conversely, while the restorative justice approach could cultivate a more positive environment and promote genuine reflection and accountability among inmates, it runs the risk of being perceived as lenient, potentially leading to further misconduct if not taken seriously by all inmates.
+</p>
+
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Best Solution
+</div>
+
+<p style="margin-bottom:28px;">
+The recommended solution is to adopt the Restorative Justice Approach.
+</p>
+
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Explanation
+</div>
+
+<p style="margin-bottom:18px;">
+The choice of the restorative justice approach aligns more closely with the ultimate goal of corrections: rehabilitation and reintegration into society.
+</p>
+
+<p style="margin-bottom:18px;">
+By facilitating discussions that allow inmates to acknowledge their behaviors and their effects, this method fosters a deeper understanding of accountability.
+</p>
+
+<p style="margin-bottom:28px;">
+It encourages personal growth and the development of empathy, which are crucial for reducing recidivism rates.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Promotes Understanding
+</div>
+
+<p style="margin-bottom:20px;">
+Inmates are given a platform to express their feelings and experiences, which can help them process their actions more constructively.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Encourages Responsibility
+</div>
+
+<p style="margin-bottom:20px;">
+Through dialogue, inmates learn to see themselves as part of a community. They begin to recognize how their actions affect not only their own lives but also the lives of others, fostering a sense of responsibility.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Builds Relationships
+</div>
+
+<p style="margin-bottom:20px;">
+Restorative practices can improve the relationship between staff and inmates. A supportive environment where accountability is emphasized rather than purely punitive can lead to better communication and trust.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Long-Term Benefits
+</div>
+
+<p style="margin-bottom:28px;">
+While immediate compliance might be less evident compared to strict punitive measures, the long-term benefits of reduced recidivism and improved inmate behavior will outweigh short-term successes.
+</p>
+
+<p>
+While both approaches have their merits, the restorative justice model offers a more holistic route to improving inmate accountability, addressing the identity, morality, and the potential for transformation within each individual.
+</p>
+
+<p>
+This model aligns with the core objectives of correctional facilities: to rehabilitate rather than punish.
+</p>
+`
+}, 
+{
+  id: 4,
+  title: "Security of Inmates",
+  competency: 4,
+
+  scenario: `
+<div style="font-size:13px;font-weight:800;color:#1f4e79;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;">
+Scenario
+</div>
+
+<p style="margin-bottom:22px;">
+In a medium-security correctional facility in Canada, a corrections officer named Officer Lee is faced with a challenging situation that tests her ethical beliefs and decision-making skills regarding the security of inmates.
+</p>
+
+<p style="margin-bottom:22px;">
+Officer Lee has been observing a pattern of behavior among a group of inmates who have become increasingly aggressive towards one another. Recently, inmate Thompson, known for his violent past, has been seen conversing with several other inmates, and there are rumors that they may be planning an altercation.
+</p>
+
+<p style="margin-bottom:22px;">
+Officer Lee has a duty to maintain the safety and security of all inmates within the facility, but she also understands that it is crucial to ensure that inmates’ rights are respected.
+</p>
+
+<p>
+One afternoon, Officer Lee overhears Thompson discussing “settling scores” with another inmate. The conversation suggests a potential fight that could harm not only the individuals involved but also other inmates and staff members.
+</p>
+
+<p style="margin-top:22px;">
+She is aware that reporting this to her superiors could lead to preemptive disciplinary action against Thompson and his associates, potentially exacerbating tensions and leading to further violence.
+</p>
+
+<p style="margin-top:22px;">
+However, if she chooses to ignore it, she risks the safety of everyone involved.
+</p>
+`,
+
+  options: [
+`<div style="font-weight:700;margin-bottom:8px;">
+Report the overheard conversation
+</div>
+
+Report the overheard conversation to her superiors and take immediate action to prevent any potential violence.
+
+This approach may protect the safety of the inmates in the short term, but it could also escalate tensions and create feelings of mistrust among the inmates, particularly if they perceive her as a traitor or as someone who cannot be trusted.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">
+Confront Thompson directly and attempt to mediate the situation herself
+</div>
+
+This could help diffuse the immediate threat and build positive relationships with the inmates.
+
+However, it could put her in a dangerous position, as confronting a potentially volatile inmate might provoke an unpredictable reaction.`,
+
+`<div style="font-weight:700;margin-bottom:8px;">
+Do nothing and monitor the situation quietly
+</div>
+
+Hope that tensions will decrease on their own.
+
+This choice avoids the immediate confrontation but leaves the possibility of violence unaddressed, risking harm to multiple individuals.`
+  ],
+
+  correct: 0,
+
+  explanation: `
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Best Approach/Solution
+</div>
+
+<p style="margin-bottom:22px;">
+The best approach for Officer Lee is to report the overheard conversation to her superiors while simultaneously preparing to engage with Thompson and the other inmates in a constructive manner.
+</p>
+
+<p style="margin-bottom:28px;">
+This dual approach ensures that she upholds her ethical responsibility to protect the inmates and staff.
+</p>
+
+<div style="font-size:20px;font-weight:700;color:#17202c;margin-bottom:18px;">
+Explanation
+</div>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Safety First
+</div>
+
+<p style="margin-bottom:22px;">
+By reporting the potential threat, Officer Lee prioritizes the immediate safety of all individuals in the facility. It is her duty to act upon credible information that indicates a risk of violence.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Maintaining Professional Integrity
+</div>
+
+<p style="margin-bottom:22px;">
+Reporting the conversation demonstrates her commitment to professionalism and the protocols in place designed to ensure safety. It shows that she is vigilant and takes her responsibilities seriously.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Building Relationships
+</div>
+
+<p style="margin-bottom:22px;">
+Alongside her report, Officer Lee can request to facilitate a conflict resolution session with Thompson and the other inmates involved.
+</p>
+
+<p style="margin-bottom:22px;">
+This proactive engagement can help de-escalate tensions, empowering inmates to communicate their grievances constructively rather than through violence.
+</p>
+
+<div style="font-size:16px;font-weight:700;color:#17202c;margin-bottom:10px;">
+Preventative Measures
+</div>
+
+<p style="margin-bottom:28px;">
+Engaging in dialogue allows for addressing underlying issues that may lead to aggression among inmates. It fosters an environment where inmates feel heard and respected, which can mitigate future conflicts.
+</p>
+
+<p>
+In conclusion, Officer Lee’s dilemma illustrates the complexity faced by correctional officers in balancing the safety of inmates with respect for their rights.
+</p>
+
+<p style="margin-top:22px;">
+By reporting the potential threat while also seeking to mediate the situation, she navigates the ontological concerns of her role and responsibilities effectively, prioritizing both safety and human dignity.
+</p>
+`
+}
+
 ];
 
 const STORAGE_KEY="csc_ready_progress_v2";
 const API_KEY_STORAGE_KEY="csc_ready_openai_key_v1";
+const DILEMMA_VERSION="textbook_v2";
 
 function loadProgress(){
   try{
@@ -203,13 +725,14 @@ function loadProgress(){
 }
 
 function getDefaultProgress(){
-  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{},activeQuizzes:{},activeDilemmas:{current:null,answers:[]}};
+  return{lastStudied:null,categoryScores:{},wrongQuestions:[],masteredCategories:[],totalAnswered:0,totalCorrect:0,sessionHistory:[],arabicCache:{},activeQuizzes:{},activeDilemmas:{version:DILEMMA_VERSION,current:null,answers:[]}};
 }
 
 function normalizeProgress(progress){
   const activeQuizzes={...(progress?.activeQuizzes||{})};
   delete activeQuizzes.drill;
-  return{...getDefaultProgress(),...progress,activeQuizzes,activeDilemmas:progress?.activeDilemmas||{current:null,answers:[]}};
+  const activeDilemmas=progress?.activeDilemmas?.version===DILEMMA_VERSION?progress.activeDilemmas:getDefaultProgress().activeDilemmas;
+  return{...getDefaultProgress(),...progress,activeQuizzes,activeDilemmas};
 }
 
 function saveProgress(p){
@@ -307,6 +830,69 @@ function serializeQuiz(state){
   };
 }
 
+function stripHtml(html){
+  const div=document.createElement("div");
+  div.innerHTML=html||"";
+  return div.textContent.replace(/\s+/g," ").trim();
+}
+
+function getOptionHeading(option){
+  const match=(option||"").match(/<div[^>]*>(.*?)<\/div>/i);
+  return stripHtml(match?match[1]:option).split(".")[0];
+}
+
+function splitDilemmaExplanation(d){
+  const html=d.explanation||"";
+  if(![1,2,3,4].includes(d.id))return{before:html,after:""};
+  const markers=[
+    "Conclusion: The Best Solution",
+    "Best Approach/Solution",
+    "Best Solution"
+  ];
+  for(const marker of markers){
+    const index=html.indexOf(marker);
+    if(index>=0){
+      const sectionStart=html.lastIndexOf("<div",index);
+      const splitAt=sectionStart>=0?sectionStart:index;
+      return{before:html.slice(0,splitAt).trim(),after:html.slice(splitAt).trim()};
+    }
+  }
+  return{before:html,after:""};
+}
+
+function getDilemmaFeedback(d,selected){
+  const correctTitle=getOptionHeading(d.options[d.correct]);
+  const selectedTitle=getOptionHeading(d.options[selected]);
+  const correct=selected===d.correct;
+  const textbookSolution=splitDilemmaExplanation(d).after;
+  const feedback={
+    1:"The best answer is the containment strategy because it balances life safety with institutional control. Immediate evacuation prioritizes safety but creates serious escape and disorder risks, while waiting for external help can cost critical time.",
+    2:"The best answer is the balanced approach because the institution needs immediate safety controls and long-term rehabilitation support. Security alone can worsen tension, while rehabilitation alone may not address the immediate violence risk.",
+    3:"The best answer is the restorative justice approach because the goal is long-term accountability and rehabilitation. Strict punishment may create short-term compliance, but it can also build resentment and undermine genuine responsibility.",
+    4:"The best answer is to report the overheard conversation because Officer Lee has credible information about a possible violent incident. Reporting protects immediate safety, while a constructive follow-up helps address tensions without ignoring inmate dignity."
+  }[d.id]||"The correct answer best matches the textbook's recommended approach and balances safety, professionalism, and correctional responsibilities.";
+
+  return `
+    <div style="font-size:18px;font-weight:700;color:${correct?"#1f7a4d":"#b42318"};margin-bottom:12px;">
+      ${correct?"Correct":"Not the best choice"}
+    </div>
+    ${correct?`
+      <p style="margin-bottom:14px;">You selected <strong>${selectedTitle}</strong>, which matches the recommended approach.</p>
+    `:`
+      <p style="margin-bottom:12px;">You selected <strong>${selectedTitle}</strong>.</p>
+      <p style="margin-bottom:14px;">The correct answer is <strong>${correctTitle}</strong>.</p>
+    `}
+    <p style="margin-bottom:${textbookSolution?"22px":"0"};">${feedback}</p>
+    ${textbookSolution?`
+      <div style="height:1px;background:#d7dee8;margin:20px 0;"></div>
+      <div style="font-size:13px;color:#1f4e79;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;">
+        Textbook Best Solution
+      </div>
+      ${textbookSolution}
+    `:""}
+  `;
+}
+
 function App(){
   const [screen,setScreen]=useState("home");
   const [progress,setProgress]=useState(loadProgress);
@@ -374,11 +960,11 @@ function App(){
   };
 
   const saveActiveDilemmas=(state)=>{
-    setProgress(prev=>({...prev,activeDilemmas:{current:state.current,answers:state.answers||[]}}));
+    setProgress(prev=>({...prev,activeDilemmas:{version:DILEMMA_VERSION,current:state.current,answers:state.answers||[]}}));
   };
 
   const resetActiveDilemmas=()=>{
-    setProgress(prev=>({...prev,activeDilemmas:{current:null,answers:[]}}));
+    setProgress(prev=>({...prev,activeDilemmas:{version:DILEMMA_VERSION,current:null,answers:[]}}));
   };
 
   const startQuiz=(mode,category=null,forceNew=false)=>{
@@ -794,7 +1380,7 @@ function ResultsScreen({results,mode,apiKey,onDrill,onHome}){
 }
 
 function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,onHome}){
-  const savedDilemmas=progress.activeDilemmas||{current:null,answers:[]};
+  const savedDilemmas=progress.activeDilemmas?.version===DILEMMA_VERSION?progress.activeDilemmas:{current:null,answers:[]};
   const [current,setCurrent]=useState(savedDilemmas.current??null);
   const [answers,setAnswers]=useState(savedDilemmas.answers||[]);
   const [selected,setSelected]=useState(null);
@@ -817,6 +1403,7 @@ function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,
   const goToScenario=(index)=>{
     setCurrent(index);
     saveActiveDilemmas({current:index,answers});
+    setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),0);
   };
 
   const submitScenario=()=>{
@@ -863,14 +1450,14 @@ function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,
         <button className="btn btn-ghost btn-sm" onClick={onHome}>Back</button>
       </div>
       <div style={{marginBottom:22,fontSize:15,color:"#667085",lineHeight:1.7,maxWidth:760}}>
-        These are detailed scenario analyses based on real corrections dilemmas. Read the full situation, choose the best approach, and learn why using the 5 Core Competencies.
+        These are detailed scenario analyses based on real corrections dilemmas. Read the full situation, choose the best approach, and learn why using the 4 Core Competencies.
       </div>
       {DILEMMAS.map((d,i)=>{
         const saved=answers.find(a=>a.id===d.id);
         return <div key={d.id} className="card" style={{marginBottom:16,cursor:"pointer"}} onClick={()=>goToScenario(i)}>
           <div style={{fontSize:12,color:"#1f4e79",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:10}}>Scenario {i+1}</div>
           <div style={{fontSize:17,fontWeight:600,marginBottom:8}}>{d.title}</div>
-          <div style={{fontSize:14,color:"#667085",lineHeight:1.65}}>{d.scenario.slice(0,120)}...</div>
+          <div style={{fontSize:14,color:"#667085",lineHeight:1.65}}>{stripHtml(d.scenario).slice(0,140)}...</div>
           {saved&&<span className={`badge ${saved.correct?"badge-green":"badge-red"}`} style={{marginTop:12}}>{saved.correct?"Answered correctly":"Answered incorrectly"}</span>}
           <div className="competency-tag" style={{marginTop:10}}>Competency {d.competency}: {COMPETENCIES[d.competency]}</div>
         </div>;
@@ -895,7 +1482,40 @@ function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,
       <div className="competency-tag" style={{marginBottom:16}}>Competency {d.competency}: {COMPETENCIES[d.competency]}</div>
 
       {arabicOn&&arabic.scenario&&<div className="arabic-text" style={{marginBottom:8}}>{arabic.scenario}</div>}
-      <div style={{fontSize:15,color:arabicOn?"#667085":"#344054",lineHeight:1.8,marginBottom:28,padding:"20px",background:"#ffffff",borderRadius:8,border:"1px solid #d7dee8"}}>{d.scenario}</div>
+      {(()=>{const explanationSections=splitDilemmaExplanation(d);return <>
+      <div
+  style={{
+    fontSize:15,
+    color:arabicOn?"#667085":"#344054",
+    lineHeight:1.9,
+    marginBottom:28,
+    padding:"28px",
+    background:"#ffffff",
+    borderRadius:14,
+    border:"1px solid #d7dee8"
+  }}
+  dangerouslySetInnerHTML={{__html:d.scenario}}
+/>
+
+      {explanationSections.before&&<div
+        style={{
+          fontSize:15,
+          color:"#344054",
+          lineHeight:1.9,
+          marginBottom:28,
+          padding:"24px 28px",
+          background:"#f8fafc",
+          borderRadius:10,
+          border:"1px solid #d7dee8",
+          borderLeft:"4px solid #1f4e79"
+        }}
+      >
+        <div style={{fontSize:13,color:"#1f4e79",fontWeight:800,letterSpacing:1,textTransform:"uppercase",marginBottom:16}}>
+          Textbook Analysis
+        </div>
+        <div dangerouslySetInnerHTML={{__html:explanationSections.before}}/>
+      </div>}
+      </>;})()}
 
       <div style={{fontSize:14,fontWeight:700,color:"#667085",marginBottom:12,textTransform:"uppercase",letterSpacing:.8}}>Choose the best approach</div>
       {d.options.map((opt,i)=>{
@@ -906,9 +1526,21 @@ function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,
         }else if(selected===i)cls+=" selected-correct";
         return<div key={i}>
           {arabicOn&&arabic.options?.[i]&&<div className="arabic-text" style={{fontSize:14,padding:"10px 14px",background:"#eef2f6",borderRadius:"8px 8px 0 0",marginBottom:-2}}>{arabic.options[i]}</div>}
-          <button className={cls} disabled={submitted} onClick={()=>!submitted&&setSelected(i)}>
-            <span style={{color:"#667085",marginRight:10,fontWeight:700}}>{String.fromCharCode(65+i)}.</span>{opt}
-          </button>
+          <button
+  className={cls}
+  disabled={submitted}
+  onClick={()=>!submitted&&setSelected(i)}
+  dangerouslySetInnerHTML={{
+    __html: `
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div style="color:#667085;font-weight:700;">
+          ${String.fromCharCode(65+i)}.
+        </div>
+        <div>${opt}</div>
+      </div>
+    `
+  }}
+/>
         </div>;
       })}
 
@@ -920,12 +1552,14 @@ function DilemmasScreen({apiKey,progress,saveActiveDilemmas,resetActiveDilemmas,
       </div>}
 
       {submitted&&<div className={`explanation-box ${selected===d.correct?"":"wrong"}`}>
-        <div style={{fontWeight:700,color:selected===d.correct?"#1f7a4d":"#b42318",marginBottom:8}}>
-          {selected===d.correct?"Best Approach":"Not the Best Choice"}
-        </div>
-        {arabicOn&&arabic.explanation&&<div className="arabic-text" style={{marginBottom:8}}>{arabic.explanation}</div>}
-        <div style={{fontSize:15,lineHeight:1.75,color:arabicOn?"#667085":"#344054"}}>{d.explanation}</div>
-      </div>}
+        <div
+  style={{
+    fontSize:15,
+    lineHeight:1.9,
+    color:arabicOn?"#667085":"#344054"
+  }}
+  dangerouslySetInnerHTML={{__html:getDilemmaFeedback(d,selected)}}
+/>      </div>}
 
       {submitted&&<div style={{display:"flex",gap:12,marginTop:16}}>
         <button className="btn btn-secondary" style={{flex:1,justifyContent:"center",opacity:current===0?0.45:1}} onClick={()=>goToScenario(current-1)} disabled={current===0}>Previous</button>
