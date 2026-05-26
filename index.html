@@ -207,7 +207,9 @@ function getDefaultProgress(){
 }
 
 function normalizeProgress(progress){
-  return{...getDefaultProgress(),...progress,activeQuizzes:progress?.activeQuizzes||{},activeDilemmas:progress?.activeDilemmas||{current:null,answers:[]}};
+  const activeQuizzes={...(progress?.activeQuizzes||{})};
+  delete activeQuizzes.drill;
+  return{...getDefaultProgress(),...progress,activeQuizzes,activeDilemmas:progress?.activeDilemmas||{current:null,answers:[]}};
 }
 
 function saveProgress(p){
@@ -357,33 +359,17 @@ function App(){
   };
 
   const saveActiveQuiz=(state)=>{
+    if(state.mode==="drill")return;
     const quizKey=state.quizKey||getQuizKey(state.mode,state.category);
     const saved=serializeQuiz({...state,quizKey});
     setProgress(prev=>({...prev,activeQuizzes:{...(prev.activeQuizzes||{}),[quizKey]:saved}}));
   };
 
-  const resetActiveQuiz=(quizKey,answersToRemove=[])=>{
+  const resetActiveQuiz=(quizKey)=>{
     setProgress(prev=>{
       const nextActive={...(prev.activeQuizzes||{})};
       delete nextActive[quizKey];
-      const next={...prev,activeQuizzes:nextActive};
-      answersToRemove.forEach(answer=>{
-        const question=getQuestionById(answer.qId);
-        const category=answer.category||question?.category;
-        next.totalAnswered=Math.max(0,(next.totalAnswered||0)-1);
-        if(answer.correct)next.totalCorrect=Math.max(0,(next.totalCorrect||0)-1);
-        if(category&&next.categoryScores?.[category]){
-          next.categoryScores={...next.categoryScores};
-          next.categoryScores[category]={
-            correct:Math.max(0,(next.categoryScores[category].correct||0)-(answer.correct?1:0)),
-            total:Math.max(0,(next.categoryScores[category].total||0)-1)
-          };
-        }
-        if(!answer.correct){
-          next.wrongQuestions=(next.wrongQuestions||[]).filter(id=>id!==answer.qId);
-        }
-      });
-      return next;
+      return{...prev,activeQuizzes:nextActive};
     });
   };
 
@@ -397,7 +383,7 @@ function App(){
 
   const startQuiz=(mode,category=null,forceNew=false)=>{
     const quizKey=getQuizKey(mode,category);
-    const restored=!forceNew?restoreQuiz(progress.activeQuizzes?.[quizKey]):null;
+    const restored=mode!=="drill"&&!forceNew?restoreQuiz(progress.activeQuizzes?.[quizKey]):null;
     if(restored){
       setQuizState(restored);
       setScreen("quiz");
@@ -426,10 +412,8 @@ function App(){
   if(screen==="dilemmas")return<DilemmasScreen apiKey={apiKey} progress={progress} saveActiveDilemmas={saveActiveDilemmas} resetActiveDilemmas={resetActiveDilemmas} onHome={()=>setScreen("home")}/>;
   if(screen==="category")return<CategorySelect onSelect={(cat)=>startQuiz("category",cat)} onHome={()=>setScreen("home")} progress={progress}/>;
 
-  const activeDrill=progress.activeQuizzes?.drill;
-  const drillDisabled=!activeDrill&&progress.wrongQuestions.length===0;
-  const drillLabel=activeDrill?"Continue Weak Areas":"Drill Weak Areas";
-  const drillBadge=activeDrill?`${activeDrill.answers?.length||0}/${activeDrill.questionIds?.length||0}`:progress.wrongQuestions.length;
+  const drillCount=progress.wrongQuestions.length;
+  const drillDisabled=drillCount===0;
 
   return(
     <div className="app">
@@ -475,7 +459,7 @@ function App(){
         <button className="btn btn-primary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("category")}>Quiz by Category</button>
         <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>startQuiz("all")}>{progress.activeQuizzes?.all?"Continue All Questions":"All Questions"}</button>
         <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px",opacity:drillDisabled?0.4:1}} onClick={()=>startQuiz("drill")} disabled={drillDisabled}>
-          {drillLabel} {(activeDrill||drillBadge>0)&&<span className={`badge ${activeDrill?"badge-blue":"badge-red"}`}>{drillBadge}</span>}
+          Drill Weak Areas {drillCount>0&&<span className="badge badge-red">{drillCount}</span>}
         </button>
         <button className="btn btn-secondary" style={{justifyContent:"center",fontSize:16,padding:"18px"}} onClick={()=>setScreen("dilemmas")}>{progress.activeDilemmas?.answers?.length||progress.activeDilemmas?.current!==null?"Continue Dilemma Scenarios":"Dilemma Scenarios"}</button>
       </div>
@@ -598,8 +582,23 @@ function QuizScreen({quizState,setQuizState,apiKey,updateProgress,progress,saveA
 
   const resetQuiz=()=>{
     if(answers.length>0&&!window.confirm("Reset this quiz and clear its saved answers?"))return;
-    const resetState={...quizState,current:0,answers:[],sessionStart:Date.now()};
-    resetActiveQuiz(quizState.quizKey,answers);
+    let resetQuestions=quizState.questions;
+    if(mode==="drill"){
+      const currentWeakIds=new Set(progress.wrongQuestions||[]);
+      answers.forEach(answer=>{
+        if(answer.correct)currentWeakIds.delete(answer.qId);
+        else currentWeakIds.add(answer.qId);
+      });
+      resetQuestions=QUESTIONS.filter(question=>currentWeakIds.has(question.id));
+      if(resetQuestions.length===0){
+        resetActiveQuiz(quizState.quizKey);
+        setAnswers([]);
+        onHome();
+        return;
+      }
+    }
+    const resetState={...quizState,questions:resetQuestions,current:0,answers:[],sessionStart:Date.now()};
+    resetActiveQuiz(quizState.quizKey);
     setAnswers([]);
     setQuizState(resetState);
     saveActiveQuiz(resetState);
